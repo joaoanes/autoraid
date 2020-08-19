@@ -2,25 +2,58 @@ defmodule Autoraid.Matchmaker do
   use GenServer
   require Logger
 
-  def init([available_bosses: _, queues_pid: _, registry_pid: _, rooms_pid: _] = state) do
-      schedule_work()
-      {:ok, state}
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
-  def handle_call(:matchmake, [available_bosses: available_bosses, registry_pid: r_pid, queues_pid: q_pid, rooms_pid: ro_pid] = state) do
-      matchmake_rooms(available_bosses, r_pid, q_pid)
+  def init(%{available_bosses: _, queues_pid: _, registry_pid: _, rooms_pid: _} = state) do
+      interval = Map.get(state, :interval, 1000)
+      schedule_work(interval)
+
+      {:ok, Map.put(state, "interval", interval)}
+  end
+
+  def handle_info(:matchmake, %{available_bosses: available_bosses, registry_pid: r_pid, queues_pid: q_pid, rooms_pid: ro_pid, interval: interval} = state) do
+    matchmake_rooms(available_bosses, r_pid, q_pid)
+      |> Autoraid.Junkyard.ok!
       |> Enum.map(fn ({_boss, rooms}) ->
-        create_rooms(rooms, q_pid, ro_pid)
+        create_rooms(rooms, q_pid, r_pid, ro_pid)
       end)
-      schedule_work() # Reschedule once more
+      schedule_work(interval)
       {:noreply, state}
   end
 
-  def create_rooms(_rooms, _q_pid, _ro_pid) do
-    # create room and warn next service to send room receipts
-    # if this fails return users to queue with prio
+  def create_room(%{raid: %{raid_boss: %{name: boss}} = raid, users: users}, r_pid, ro_pid) do
+    :ok = Autoraid.RaidRegistry.delete(r_pid, boss, raid)
+    Autoraid.RoomRegistry.put(ro_pid, %{raid: raid, members: users, id: UUID.uuid4})
   end
 
+  def create_rooms(rooms, q_pid, r_pid, ro_pid) do
+    rooms
+    |> Enum.map(
+      fn room_struct ->
+        try do
+          :ok = create_room(room_struct, r_pid, ro_pid)
+        rescue
+          err -> (
+            Logger.error(Exception.format(:error, err, __STACKTRACE__))
+
+            %{raid: %{raid_boss: %{name: boss}} = raid, users: users} = room_struct
+
+            users
+            |> Enum.each(fn user -> :ok = Autoraid.RaidQueues.append(q_pid, boss, user) end)
+
+            :ok = Autoraid.RaidRegistry.put(r_pid, boss, raid)
+
+            # let's not let it crash?
+            :ok
+          )
+        end
+      end
+    )
+  end
+
+  @spec matchmake_rooms(any, any, any) :: {:error, :processing_failed} | {:ok, any}
   def matchmake_rooms(available_bosses, r_pid, q_pid) do
     Enum.map(available_bosses, fn boss ->
       {:ok, count} = Autoraid.RaidQueues.count(q_pid, boss)
@@ -49,7 +82,7 @@ defmodule Autoraid.Matchmaker do
                   {:ok, users} = Autoraid.RaidQueues.pop(q_pid, boss, m_inv)
                   [
                     current_count: count - m_inv,
-                    rooms: rooms ++ [Map.merge(possible_room, %{users: users})],
+                    rooms: rooms ++ [%{raid: possible_room, users: users}],
                   ]
                 false -> state
               end
@@ -60,6 +93,7 @@ defmodule Autoraid.Matchmaker do
     )
     |> Enum.map(fn ({boss, [current_count: _, rooms: rooms]}) -> {boss, rooms} end)
     |> Map.new
+    |> Autoraid.Junkyard.make_ok
 
   rescue
     err ->
@@ -69,7 +103,7 @@ defmodule Autoraid.Matchmaker do
 
   defp has_players(%{max_invites: m_inv}, player_count), do: player_count >= m_inv
 
-  defp schedule_work() do
-      Process.send_after(self(), :matchmake, 5000)
+  defp schedule_work(interval) do
+      Process.send_after(self(), :matchmake, interval)
   end
 end

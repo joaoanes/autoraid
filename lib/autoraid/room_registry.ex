@@ -15,28 +15,19 @@ defmodule Autoraid.RoomRegistry do
   @doc """
   Gets a value from the `bucket` by `key`.
   """
-  def get(bucket, key) do
-    Agent.get(bucket, fn list ->
-      case Map.has_key?(list, key) do
-        true -> {:ok, Map.get(list, key)}
-        false -> {:error, :not_found}
-      end
-    end )
+  def get(bucket) do
+    Agent.get(bucket, &Autoraid.Junkyard.make_ok/1)
   end
 
-  def count(bucket, key) do
-    Agent.get(bucket, fn list ->
-      case Map.has_key?(list, key) do
-        true -> {:ok, Enum.count(Map.get(list, key))}
-        false -> {:error, :not_found}
-      end
-    end )
+  def count(bucket) do
+    Agent.get(bucket, &Enum.count/1)
+    |> Autoraid.Junkyard.make_ok()
   end
 
   @doc """
   Puts the `value` for the given `key` in the `bucket`.
   """
-  def put(bucket, key, room) do
-    Agent.update(bucket, &Map.update!(&1, key, fn rooms -> rooms ++ [room] end))
+  def put(bucket, room) do
+    Agent.update(bucket, &([room] ++ &1))
   end
 end

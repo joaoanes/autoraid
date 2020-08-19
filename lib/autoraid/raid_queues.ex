@@ -38,6 +38,10 @@ defmodule Autoraid.RaidQueues do
     Agent.update(bucket, &Map.update!(&1, key, fn users -> users ++ [value] end))
   end
 
+  def append(bucket, key, value) do
+    Agent.update(bucket, &Map.update!(&1, key, fn users -> [value] ++ users end))
+  end
+
   def pop(bucket, key, num \\ 1) do
     {users, rest} = Agent.get(bucket, fn l ->
       Map.get(l, key)

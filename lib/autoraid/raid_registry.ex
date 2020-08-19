@@ -34,6 +34,10 @@ defmodule Autoraid.RaidRegistry do
     end )
   end
 
+  def delete(bucket, key, value) do
+    Agent.update(bucket, &Map.update!(&1, key, fn list -> List.delete(list, value) end))
+  end
+
   @doc """
   Puts the `value` for the given `key` in the `bucket`.
   """
