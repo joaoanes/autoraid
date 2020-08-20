@@ -6,10 +6,13 @@ defmodule Autoraid.RoomRegistry do
   @doc """
   Starts a new bucket.
   """
-  def start_link([]) do
-    Agent.start_link(fn ->
-      []
-    end)
+  def start_link(opts) do
+    Agent.start_link(
+      fn ->
+        []
+      end,
+      opts
+    )
   end
 
   @doc """

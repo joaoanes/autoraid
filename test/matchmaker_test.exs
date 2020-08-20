@@ -22,9 +22,9 @@ defmodule Autoraid.MatchmakerTest do
       |> Autoraid.Matchmaker.create_rooms(q_pid, r_pid, ro_pid)
 
       expected_raid_id = e_x.raid.id
-      expected_raid_users = e_x.users
+      expected_raid_users = e_x.members
       expected_raid2_id = e_x2.raid.id
-      expected_raid2_users = e_x2.users
+      expected_raid2_users = e_x2.members
 
       assert {:ok, [
         %{raid: %{id: ^expected_raid2_id}, members: ^expected_raid2_users},
@@ -33,7 +33,34 @@ defmodule Autoraid.MatchmakerTest do
       assert {:ok, 0} = Autoraid.RaidRegistry.count(r_pid, "MISSINGNO")
     end
 
-end
+  end
+
+  describe "genserver supervisor" do
+    setup [:with_supervisor]
+
+    test "it spawns enough resources", %{m_pid: m_pid} do
+      assert [Autoraid.Matchmaker, Autoraid.Stats, Autoraid.RoomRegistry, Autoraid.RaidRegistry, Autoraid.RaidQueues] =
+        Supervisor.which_children(m_pid)
+        |> Enum.map(fn {name, _, _, _} -> name end)
+    end
+
+    test "it matchmakes!", %{m_pid: m_pid} do
+      %{r_pid: r_pid, q_pid: q_pid, ro_pid: ro_pid} = Autoraid.Supervisor.process_pids(m_pid)
+
+      with_queued_raids("MISSINGNO", q_pid, r_pid, [Autoraid.Test.FactoryYard.create("Raid")])
+
+      assert {:ok, 0} = Autoraid.RoomRegistry.count(ro_pid)
+      assert {:ok, 7} = Autoraid.RaidQueues.count(q_pid, "MISSINGNO")
+      assert {:ok, 1} = Autoraid.RaidRegistry.count(r_pid, "MISSINGNO")
+
+      # yeah, I don't like this either. but hey, it's short!
+      Process.sleep(50)
+
+      assert {:ok, [
+        %{raid: %{raid_boss: %{name: "MISSINGNO"}}},
+      ]} = Autoraid.RoomRegistry.get(ro_pid)
+    end
+  end
 
   @tag :long
   describe "genserver" do
@@ -46,7 +73,7 @@ end
       assert {:ok, 2} = Autoraid.RaidRegistry.count(r_pid, "MISSINGNO")
 
       # yeah, I don't like this either. but hey, it's short!
-      Process.sleep(10)
+      Process.sleep(20)
 
       assert {:ok, [
         %{raid: %{raid_boss: %{name: "MISSINGNO"}}},
@@ -65,7 +92,7 @@ end
         user
       end)
 
-      Process.sleep(10)
+      Process.sleep(20)
 
       assert {:ok, 3} = Autoraid.RoomRegistry.count(ro_pid)
       assert {:ok, 12} = Autoraid.RaidQueues.count(q_pid, "MISSINGNO")
@@ -73,13 +100,13 @@ end
       raid = Autoraid.Test.FactoryYard.create("Raid", %{max_invites: 12})
       Autoraid.RaidRegistry.put(r_pid, "MISSINGNO", raid)
 
-      Process.sleep(10)
+      Process.sleep(20)
 
       assert {:ok, 4} = Autoraid.RoomRegistry.count(ro_pid)
       assert {:ok, 0} = Autoraid.RaidQueues.count(q_pid, "MISSINGNO")
 
 
-      Process.sleep(10)
+      Process.sleep(20)
 
       assert {:ok, 4} = Autoraid.RoomRegistry.count(ro_pid)
       assert {:ok, 6} = Autoraid.RaidQueues.count(q_pid, "MEW")
@@ -87,7 +114,7 @@ end
       raid = Autoraid.Test.FactoryYard.create("Raid", %{max_invites: 6, raid_boss: %{name: "MEW"}})
       Autoraid.RaidRegistry.put(r_pid, "MEW", raid)
 
-      Process.sleep(10)
+      Process.sleep(20)
 
       assert {:ok, 5} = Autoraid.RoomRegistry.count(ro_pid)
       assert {:ok, 0} = Autoraid.RaidQueues.count(q_pid, "MEW")
@@ -113,15 +140,15 @@ end
 
     [raid1, raid2, raid3] = raids
 
-    %{users: users} = with_queued_raids("MISSINGNO", q_pid, r_pid, [raid1, raid2])
-    %{users: _mew_users} = with_queued_raids("MEW", q_pid, r_pid, [raid3])
+    %{members: members} = with_queued_raids("MISSINGNO", q_pid, r_pid, [raid1, raid2])
+    %{members: _mew_users} = with_queued_raids("MEW", q_pid, r_pid, [raid3])
 
-    first = Enum.slice(users, 0..3)
-    second = Enum.slice(users, 4..4)
-    expected_raid = %{raid: raid1, users: first}
-    expected_raid2 = %{raid: raid2, users: second}
+    first = Enum.slice(members, 0..3)
+    second = Enum.slice(members, 4..4)
+    expected_raid = %{raid: raid1, members: first}
+    expected_raid2 = %{raid: raid2, members: second}
 
-    %{raid: raid1, raid2: raid2, users: users, e_x: expected_raid, e_x2: expected_raid2}
+    %{raid: raid1, raid2: raid2, members: members, e_x: expected_raid, e_x2: expected_raid2}
   end
 
   def without_queued_users(%{q_pid: q_pid}) do
@@ -133,18 +160,23 @@ end
     raids
     |> Enum.each(&Autoraid.RaidRegistry.put(r_pid, name, &1))
 
-    users = 1..7
+    members = 1..7
     |> Enum.map(fn _ ->
       user = Autoraid.Test.FactoryYard.create("User")
       Autoraid.RaidQueues.put(q_pid, name, user)
       user
     end)
 
-    %{users: users}
+    %{members: members}
   end
 
   def with_genserver(%{q_pid: q_pid, r_pid: r_pid, ro_pid: ro_pid}) do
-    m_pid = start_supervised!({Autoraid.Matchmaker, %{available_bosses: ["MISSINGNO", "MEW"], queues_pid: q_pid, registry_pid: r_pid, rooms_pid: ro_pid, interval: 9} })
+    m_pid = start_supervised!({Autoraid.Matchmaker, %{available_bosses: ["MISSINGNO", "MEW"], queues_pid: q_pid, registry_pid: r_pid, rooms_pid: ro_pid, interval: 15} })
+    %{m_pid: m_pid}
+  end
+
+  def with_supervisor(%{}) do
+    m_pid = start_supervised!({Autoraid.Supervisor, %{available_bosses: ["MISSINGNO", "MEW"], interval: 9, app_supervisor: nil} })
     %{m_pid: m_pid}
   end
 end

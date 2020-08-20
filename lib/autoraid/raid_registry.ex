@@ -5,12 +5,16 @@ defmodule Autoraid.RaidRegistry do
   @doc """
   Starts a new bucket.
   """
-  def start_link([available_bosses: available_bosses]) do
-    Agent.start_link(fn ->
-      available_bosses
-      |> Enum.map( &( {&1, []} ))
-      |> Map.new
-    end)
+  def start_link(opts) do
+    [available_bosses: a_b] = opts
+
+    {:ok, _pid} = Agent.start_link(
+      fn ->
+        a_b
+        |> Enum.map( &( {&1, []} ))
+        |> Map.new
+      end
+    )
   end
 
   @doc """

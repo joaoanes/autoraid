@@ -23,10 +23,11 @@ defmodule Autoraid.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_aws, "~> 2.1"},
-      {:ex_aws_s3, "~> 2.0"},
-      {:hackney, "~> 1.9"},
-      {:sweet_xml, "~> 0.6"},
+      {:cowboy, "~> 2.4"},
+      {:plug, "~> 1.7"},
+      {:plug_cowboy, "~> 2.0"},
+      {:jason, "~> 1.1"},
+      {:morphix, "~> 0.8.0"},
       {:uuid, "~> 1.1"},
       {:faker, "~> 0.14", only: :test}
       # {:dep_from_hexpm, "~> 0.3.0"},

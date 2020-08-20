@@ -8,7 +8,7 @@
         },
         {
             "label": "Run All Tests",
-            "command": "mix test --trace --stale",
+            "command": "mix test --trace --stale --no-start",
             "type": "shell",
             "group": "test",
             "presentation": {

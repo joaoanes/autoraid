@@ -6,14 +6,18 @@ defmodule Autoraid.Application do
   use Application
 
   def start(_type, _args) do
+
     children = [
-      # Starts a worker by calling: Autoraid.Worker.start_link(arg)
-      # {Autoraid.Worker, arg}
+      Autoraid.AppSupervisor.child_spec([])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Autoraid.Supervisor]
+    opts = [strategy: :one_for_one]
+    IO.puts "#{__MODULE__} running"
     Supervisor.start_link(children, opts)
   end
+
+
+
 end
