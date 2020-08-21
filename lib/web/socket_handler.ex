@@ -20,7 +20,7 @@ defmodule Autoraid.Web.SocketHandler do
 
     %{action: action, me: me, data: data} = payload
 
-    :ok = handle_action(action, data, me, supervisor)
+    {:ok, new_state, ret} = handle_action(action, data, me, supervisor)
     #Registry.Autoraid
     #|> Registry.dispatch(state.registry_key, fn(entries) ->
     #  for {pid, _} <- entries do
@@ -30,11 +30,34 @@ defmodule Autoraid.Web.SocketHandler do
     #  end
     #end)
 
-    {:reply, {:text, "sure ok"}, state}
+    {:reply, {:text, ret |> Jason.encode!()}, Map.merge(new_state, Map.merge(state, %{me: me}))}
   end
 
   def websocket_info(info, state) do
     {:reply, {:text, info}, state}
+  end
+
+  @spec terminate(any, any, map) :: :ok
+  def terminate(_reason, _req, %{supervisor: supervisor} = state) do
+    case Map.fetch(state, :me) do
+      :error -> :ok
+      {:ok, me} -> (
+        %{q_pid: q_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
+        Autoraid.RaidQueues.remove_from_all(q_pid, me)
+        IO.puts "Removed #{me.name}"
+      )
+    end
+
+    case Map.fetch(state, :raid) do
+      :error -> :ok
+      {:ok, raid} -> (
+        %{r_pid: r_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
+        Autoraid.RaidRegistry.delete(r_pid, raid.raid_boss.name, raid)
+        IO.puts "Removed #{raid.id}"
+      )
+    end
+
+    :ok
   end
 
   def handle_action("join", %{queue: queue}, me, supervisor) do
@@ -53,18 +76,18 @@ defmodule Autoraid.Web.SocketHandler do
     IO.puts "I did join #{me.name} to #{queue}, size #{size}"
 
 
-    :ok
+    {:ok, %{me: me}, %{type: :join}}
   end
 
   def handle_action("create", %{location_name: location_name, boss_name: queue} = request, me, supervisor) do
     IO.puts "I could create #{location_name} to #{queue}"
 
     %{r_pid: r_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
-    Autoraid.RaidRegistry.put(r_pid, queue, Autoraid.Web.Junkyard.raid_from_request(request, me))
+    raid = Autoraid.Web.Junkyard.raid_from_request(request, me)
+    Autoraid.RaidRegistry.put(r_pid, queue, raid)
     {:ok, size} = Autoraid.RaidRegistry.count(r_pid, queue)
-    IO.puts "I did join #{location_name} to #{queue}, size #{size}"
+    IO.puts "I did create #{location_name} to #{queue}, id #{raid.id}, size #{size}"
 
-
-    :ok
+    {:ok, %{raid: raid}, %{type: :create, raid: raid}}
   end
 end

@@ -42,6 +42,25 @@ defmodule Autoraid.RaidQueues do
     Agent.update(bucket, &Map.update!(&1, key, fn users -> [value] ++ users end))
   end
 
+  def remove_from_all(bucket, value) do
+    Agent.update(
+      bucket,
+      fn raids ->
+        raids
+        |> Enum.map(fn {boss, queue} ->
+          {
+            boss,
+            queue
+            |> Enum.filter(fn user ->
+              Autoraid.Web.Junkyard.registry_id_from_user(user) != Autoraid.Web.Junkyard.registry_id_from_user(value)
+            end)
+          }
+        end)
+        |> Map.new
+      end
+    )
+  end
+
   def pop(bucket, key, num \\ 1) do
     {users, rest} = Agent.get(bucket, fn l ->
       Map.get(l, key)
