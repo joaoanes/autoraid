@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Raid.network",
+  "name": "Raid.network",
+  "description": "Easy, one-click online raids for Pokemon Go",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#35E306",
   "background_color": "#ffffff"
 }

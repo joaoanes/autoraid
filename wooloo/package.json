@@ -6,7 +6,6 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "cra-append-sw": "^2.7.0",
     "eslint-plugin-babel": "^5.3.1",
     "lodash": "^4.17.20",
     "react": "^16.13.1",
@@ -16,8 +15,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "react-scripts start && cra-append-sw --mode dev ./src/custom-sw.js",
-    "build": "react-scripts build && cra-append-sw ./src/custom-sw.js",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

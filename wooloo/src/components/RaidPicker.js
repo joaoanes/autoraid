@@ -1,16 +1,43 @@
 import React from "react"
 
-const AVAILABLE_BOSSES = ["MISSINGNO", "MEW"]
+const AVAILABLE_BOSSES = [
+  "Oshawott",
+  "Klink",
+  "Wailmer",
+  "Shinx",
+  "Sandshrew",
+  "Magikarp",
+  "Prinplup",
+  "Mawile",
+  "Gligar",
+  "Breloom",
+  "Marowak",
+  "Kingler",
+  "Onix",
+  "Vaporeon",
+  "Donphan",
+  "Raichu",
+  "Claydol",
+  "Machamp",
+  "Weezing",
+  "Golem",
+  "Tyranitar",
+  "Rhydon",
+  "Excadrill",
+  "Marowak",
+  "Heatran"
+]
 
 const RaidPicker = ({ user, addToQueue, socketReady }) =>
   (
     <div>
-      <div>{`Of course ${user.name}! Let's get you going!`}</div>
+      <div>{`Of course ${user.name}! Let's find you a group!`}</div>
 
       <div>
         <div>
-              Which pokemon do you want to raid against?
+          Which pokemon do you want to raid against?
         </div>
+        <br></br>
 
         <div>
           <form>

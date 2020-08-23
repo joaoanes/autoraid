@@ -1,4 +1,4 @@
-const API_WEBSOCKET = "wss://3dfd49749b4c.ngrok.io/ws"
+const API_WEBSOCKET = "wss://ws.raid.network/ws"
 let global_socket = null
 
 const getSocket = (address) => (messageHandler, initHandler, closeHandler) => {
@@ -6,7 +6,7 @@ const getSocket = (address) => (messageHandler, initHandler, closeHandler) => {
     return global_socket
   }
 
-  const socket =  new WebSocket(`${API_WEBSOCKET}/${address}`, [])
+  const socket = new WebSocket(`${API_WEBSOCKET}/${address}`, [])
 
   socket.addEventListener("message", (event) => {
     messageHandler(JSON.parse(event.data.toString()))

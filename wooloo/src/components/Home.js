@@ -9,7 +9,19 @@ const Home = ({ setAppState, user }) => {
       <div>
         {user ? `Hello ${user.name}!` : "Using it is easy!"}
       </div>
+
+      {
+        user && (
+          <div>
+            <button onClick={() => router("login")}>Logout</button>
+          </div>
+        )
+      }
+
+      <br></br>
+
       <div>
+
         <button onClick={() => router("raidPicker")}>I want to raid!</button>
         <button onClick={() => router("raidCreator")}>I want to create a raid!</button>
       </div>

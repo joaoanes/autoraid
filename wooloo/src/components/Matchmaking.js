@@ -1,23 +1,30 @@
 import React from "react"
 
-const Matchmaking = ({ _stats, _started_at, activeSearch, currentStats }) => (
-  <div>
-        You're matchmaking!
+const Matchmaking = ({ _stats, _started_at, activeSearch, ownedRaid, currentStats, stop }) => {
+  const { bossName } = activeSearch ? activeSearch : ownedRaid
+  const stats = (currentStats || {})[bossName]
+  debugger
+  return (
     <div>
-      {JSON.stringify(activeSearch)}
-    </div>
+      You're matchmaking!
+      <div>
+        {(`Finding ${ownedRaid ? "users" : "raids"} for ${bossName}`)}
+      </div>
 
-    <div>
-      <h4>Current raid queue statistics</h4>
-      {Object.keys(currentStats).map((boss) => (
-        <div key={boss}>
-          <h3>{boss}</h3>
-          <div>{`Queued: ${currentStats[boss].queued}`}</div>
-          <div>{`Raids looking for group: ${currentStats[boss].rooms}`}</div>
+      <br></br>
+      <div>You can open the game now. Follow the notification for more updates (or open this page!).</div>
+      <br></br>
+      <br></br>
+
+      {
+        currentStats && <div>
+          <div>{`People looking for this raid: ${stats.queued}`}</div>
+          <div>{`Raids looking for users: ${stats.rooms}`}</div>
         </div>
-      ))}
+      }
+      <button onClick={() => stop()}>Stop matchmaking</button>
     </div>
-  </div>
-)
+  )
+}
 
 export default Matchmaking
