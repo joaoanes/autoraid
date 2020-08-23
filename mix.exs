@@ -4,11 +4,17 @@ defmodule Autoraid.MixProject do
   def project do
     [
       app: :autoraid,
-      version: "0.1.0",
+      version: "1.0.3",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: [
+        prod: [
+          include_executables_for: [:unix],
+          steps: [:assemble, :tar]
+        ]
+      ]
     ]
   end
 
@@ -35,7 +41,6 @@ defmodule Autoraid.MixProject do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib","test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
-
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

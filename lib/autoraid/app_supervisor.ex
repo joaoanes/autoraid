@@ -2,6 +2,34 @@ defmodule Autoraid.AppSupervisor do
   # Automatically defines child_spec/1
   use Supervisor
 
+  @bosses [
+    "Oshawott",
+    "Klink",
+    "Wailmer",
+    "Shinx",
+    "Sandshrew",
+    "Magikarp",
+    "Prinplup",
+    "Mawile",
+    "Gligar",
+    "Breloom",
+    "Marowak",
+    "Kingler",
+    "Onix",
+    "Vaporeon",
+    "Donphan",
+    "Raichu",
+    "Claydol",
+    "Machamp",
+    "Weezing",
+    "Golem",
+    "Tyranitar",
+    "Rhydon",
+    "Excadrill",
+    "Marowak",
+    "Heatran"
+  ]
+
   def start_link(init_arg) do
     Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
   end
@@ -20,8 +48,12 @@ defmodule Autoraid.AppSupervisor do
   @impl true
   def init(_) do
     children = [
-      Autoraid.Supervisor.child_spec(%{available_bosses: ["MISSINGNO", "MEW"], interval: 500, app_supervisor: self()}),
-      Autoraid.Web.Supervisor.child_spec([supervisor: self()])
+      Autoraid.Supervisor.child_spec(%{
+        available_bosses: @bosses,
+        interval: 500,
+        app_supervisor: self()
+      }),
+      Autoraid.Web.Supervisor.child_spec(supervisor: self())
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

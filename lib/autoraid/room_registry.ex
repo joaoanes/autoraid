@@ -1,8 +1,8 @@
-
 defmodule Autoraid.RoomRegistry do
   use Agent
 
   use Autoraid.Types
+
   @doc """
   Starts a new bucket.
   """
@@ -31,6 +31,10 @@ defmodule Autoraid.RoomRegistry do
   Puts the `value` for the given `key` in the `bucket`.
   """
   def put(bucket, room) do
+    Autoraid.Logging.log("room", "create", %{
+      payload: %{id: room.id, boss_name: room.raid.raid_boss.name}
+    })
+
     Agent.update(bucket, &([room] ++ &1))
   end
 end

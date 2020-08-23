@@ -40,7 +40,6 @@ defmodule Autoraid.Matchmaker do
       Autoraid.AppSupervisor.process_pids(app_supervisor)
 
     matchmake(available_bosses, r_pid, q_pid, ro_pid)
-    |> Autoraid.Junkyard.inspect!()
     |> broadcast_raid_creation
 
     schedule_work(interval)
@@ -94,6 +93,8 @@ defmodule Autoraid.Matchmaker do
         end
       )
     end)
+
+    rooms
   end
 
   @spec create_room(

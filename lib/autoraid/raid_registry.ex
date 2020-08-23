@@ -39,6 +39,7 @@ defmodule Autoraid.RaidRegistry do
   end
 
   def delete(bucket, key, value) do
+    Autoraid.Logging.log("raid", "delete", %{payload: %{queue: key}})
     Agent.update(bucket, &Map.update!(&1, key, fn list -> List.delete(list, value) end))
   end
 
@@ -46,10 +47,7 @@ defmodule Autoraid.RaidRegistry do
   Puts the `value` for the given `key` in the `bucket`.
   """
   def put(bucket, key, raid) do
-    IO.puts("Added raid")
-
-    raid
-    |> IO.inspect()
+    Autoraid.Logging.log("raid", "add", %{payload: %{queue: key}})
 
     Agent.update(bucket, &Map.update!(&1, key, fn raids -> raids ++ [raid] end))
   end
