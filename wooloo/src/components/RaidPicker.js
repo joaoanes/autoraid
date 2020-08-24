@@ -1,4 +1,7 @@
-import React from "react"
+import React, { useState } from "react"
+
+import Button from "./ui/Button"
+import PokemonList from "./ui/PokemonList"
 
 const AVAILABLE_BOSSES = [
   "Oshawott",
@@ -22,38 +25,93 @@ const AVAILABLE_BOSSES = [
   "Weezing",
   "Golem",
   "Tyranitar",
-  "Rhydon",
+  ",Rhydon",
   "Excadrill",
   "Marowak",
-  "Heatran"
+  "Heatran",
 ]
 
-const RaidPicker = ({ user, addToQueue, socketReady }) =>
-  (
-    <div>
+const RaidPicker = ({ user, addToQueue, activeRaids }) => {
+
+  const [selected, setSelected] = useState(null)
+  const [hasSelected, setHasSelected] = useState(false)
+  const [maxInvites, setMaxInvites] = useState(5)
+
+  return (
+    <div style={styles.container}>
       <div>{`Of course ${user.name}! Let's find you a group!`}</div>
 
-      <div>
-        <div>
-          Which pokemon do you want to raid against?
-        </div>
-        <br></br>
+      {
+        !hasSelected && (
+          <>
 
-        <div>
-          <form>
-            <div >
-              {
-                AVAILABLE_BOSSES.map((boss) => (
-                  <div key={boss}>
-                    <button disabled={!socketReady} onClick={(e) => { e.preventDefault(); addToQueue(boss) }}>{boss}</button>
-                  </div>
-                ))
-              }
+            <div>
+              Which pokemon do you want to raid against?
             </div>
-          </form>
-        </div>
-      </div>
+
+            <div style={styles.separator} />
+            <div style={styles.list}>
+              <PokemonList pokemonList={activeRaids} selected={selected} setSelected={setSelected} />
+            </div>
+
+            <div style={styles.separator} />
+            <Button selected={selected !== null} onClick={() => addToQueue(selected)} >{selected ? `Look for a ${selected.name} raid!` : "Select a Pokemon!"}</Button>
+
+          </>
+        )
+      }
     </div>
   )
+}
+
+export const styles = {
+  selectButton: {
+    backgroundColor: "unset",
+    padding: 20,
+    marginTop: 20,
+    fontSize: 18,
+    fontWeight: 700,
+    width: "80%",
+    border: "1px solid white",
+    borderRadius: 20,
+    color: "white",
+  },
+  buttonUnavailable: {
+    border: "1px solid grey",
+    color: "grey",
+  },
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "80%",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  list: {
+    height: 500,
+    overflowY: "scroll",
+    overflowX: "hidden",
+  },
+  separator: {
+    border: "1px solid white",
+    width: "100%",
+  },
+  track: {
+    backgroundColor: "white",
+  },
+  dot: {
+    border: "2px solid white",
+    width: 28,
+    height: 28,
+
+    marginTop: -12,
+  },
+  maxInvites: {
+    fontSize: 50,
+    marginTop: 40,
+    marginBottom: 40,
+  },
+}
 
 export default RaidPicker

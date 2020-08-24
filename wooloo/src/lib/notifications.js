@@ -16,13 +16,13 @@ export const setNotification = (message, body, tag, renotify = true) => {
             tag: tag || "autoraid-wooloo",
           },
         )
-      }
+      },
     )
     .catch((e) => console.error(e))
 }
 
 export const hasPermission = () => new Promise((res, rej) => {
-  Notification.requestPermission(function (result) {
+  Notification.requestPermission((result) => {
     if (result === "granted") {
       return res(true)
     }
@@ -31,19 +31,19 @@ export const hasPermission = () => new Promise((res, rej) => {
 })
 
 export const setupPWAInstall = (setPrompt) => {
-  let deferredPrompt;
+  let deferredPrompt
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    deferredPrompt = e;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    deferredPrompt = e
     setPrompt(deferredPrompt)
-  });
+  })
 }
 
 export const confirmPWAInstall = (prompt, setPrompt) => {
   prompt.prompt()
   prompt.userChoice.then((choiceResult) => {
-    if (choiceResult.outcome === 'accepted') {
+    if (choiceResult.outcome === "accepted") {
       setPrompt("accepted")
     }
-  });
+  })
 }

@@ -1,16 +1,25 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  font-family: 'Lato', sans-serif;
+  color: white;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+}
+
+#root {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  overflow-y: hidden;
+  min-width: 100%;
 }
 
 .App-header {
@@ -28,11 +37,43 @@
   color: #61dafb;
 }
 
+input:placeholder {
+  color: white;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+.toggleable:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.toggleable:active {
+  background-color: rgba(255,255,255,0.5);
+}
+
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1) translateX(0px);
+  }
+  100% {
+    transform: scale(1.2) translateX(-20px);
+  }
+}
+
+
+@keyframes fade {
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0.5;
   }
 }

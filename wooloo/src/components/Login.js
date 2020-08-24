@@ -3,6 +3,10 @@ import { every } from "lodash"
 import { getValueFromEvent } from "../lib/junkyard"
 import { setNotification } from "../lib/notifications"
 
+import Slider, { Range } from "rc-slider"
+import "rc-slider/assets/index.css"
+import Button from "./ui/Button"
+
 const checkAndGo = (name, fc, level, setUser, setAppState) => {
   if ([name, fc, level], every((thing) => thing !== "")) {
     setUser({ name, level, fc })
@@ -10,33 +14,79 @@ const checkAndGo = (name, fc, level, setUser, setAppState) => {
   }
 }
 
-const f = (e) => {
-  e.preventDefault()
-  setNotification("Raid.network", "Test notification!", "wooloo-rest")
+const isReady = (name, fc, level) => {
+  const validators = [
+    () => name !== "" && name.length <= 16,
+    () => fc !== "" && fc.length === 12,
+    () => Number.parseInt(level, 0) > 0 && Number.parseInt(level, 0) <= 40,
+  ]
+  try {
+    return every(validators, (fn) => fn())
+  }
+  catch {
+    return false
+  }
 }
 
+const setFCIfValid = (setFC, oldFC) => (value) => {
+  if (value.trim() === oldFC) { return }
+  if (value.charAt(value.length - 1) === " ") { return }
+  if (oldFC.length === 12) { return }
+  if (isNaN(Number.parseInt(value.charAt(value.length - 1), 0))) { return }
+  setFC(value)
+}
 const Login = ({ setUser, setAppState }) => {
   setUser(null)
   const [name, setName] = useState("")
   const [fc, setFC] = useState("")
   const [level, setLevel] = useState("")
 
-  console.log({ name, fc, level })
+  const localIsReady = isReady(name, fc, level)
+  const localSetFCisValid = setFCIfValid(setFC, fc)
 
   return (
-    <div>
-      <p>Not so fast! A Taurus is blocking your path!</p>
-      <p>Please create an account here!</p>
-      <button>Test notification</button>
-      <small>This information is ONLY saved on your cellphone. All data you send is eventually deleted after a couple of minutes.</small>
-      <div>
-        <input type="text" value={name} placeholder="Your in-game name" onChange={getValueFromEvent(setName)} />
-        <input type="text" value={fc} placeholder="Your in-game friendcode" onChange={getValueFromEvent(setFC)} />
-        <input type="text" value={level} placeholder="Your level" onChange={getValueFromEvent(setLevel)} />
+    <div style={styles.container}>
+      <img style={styles.tauros} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${128}.png`}></img>
+      <p>Not so fast! A Tauros is blocking your path!</p>
+      <p>But while you're here, tell us about yourself!</p>
+      <div style={styles.inputContainer}>
+        <input style={styles.input} type="text" value={name} placeholder="Your in-game name" onChange={getValueFromEvent(setName)} />
+        <input style={styles.input} type="text" value={fc} placeholder="Your in-game friendcode (12 characters)" onChange={getValueFromEvent(localSetFCisValid)} />
+        <input style={styles.input} type="text" value={level} placeholder="Your level" onChange={getValueFromEvent(setLevel)} />
+        <small>This information is ONLY saved on your cellphone. All data you send is eventually deleted after a couple of minutes.</small>
       </div>
-      <button onClick={() => checkAndGo(name, fc, level, setUser, setAppState)}>Ok, let's go!</button>
+      <Button selected={localIsReady} onClick={() => checkAndGo(name, fc, level, setUser, setAppState)}>{localIsReady ? "Let's get raiding!" : "Please fill in above"}</Button>
     </div>
   )
+}
+
+const styles = {
+  inputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+  },
+  container: {
+    width: "80%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  tauros: {
+    minHeight: 96,
+  },
+  input: {
+    border: "unset",
+    backgroundColor: "unset",
+    color: "white",
+    borderBottom: "1px solid white",
+    margin: 20,
+    width: "100%",
+    fontSize: 16,
+  },
 }
 
 export default Login

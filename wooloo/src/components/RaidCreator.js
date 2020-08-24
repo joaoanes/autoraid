@@ -1,73 +1,51 @@
 import React, { useState } from "react"
-import { getValueFromEvent } from "../lib/junkyard"
+import Slider, { Range } from "rc-slider"
+import "rc-slider/assets/index.css"
 
-const AVAILABLE_BOSSES = [
-  "Oshawott",
-  "Klink",
-  "Wailmer",
-  "Shinx",
-  "Sandshrew",
-  "Magikarp",
-  "Prinplup",
-  "Mawile",
-  "Gligar",
-  "Breloom",
-  "Marowak",
-  "Kingler",
-  "Onix",
-  "Vaporeon",
-  "Donphan",
-  "Raichu",
-  "Claydol",
-  "Machamp",
-  "Weezing",
-  "Golem",
-  "Tyranitar",
-  "Rhydon",
-  "Excadrill",
-  "Marowak",
-  "Heatran"
-]
+import { styles } from "./RaidPicker"
+import Button from "./ui/Button"
+import PokemonList from "./ui/PokemonList"
 
-const RaidCreator = ({ user, socketReady, addRaidToQueue }) => {
-  const [maxInvites, setMaxInvites] = useState("5")
-  const [location, setLocation] = useState("")
+const RaidCreator = ({ user, addRaidToQueue, activeRaids }) => {
+
+  const [selected, setSelected] = useState(null)
+  const [hasSelected, setHasSelected] = useState(false)
+  const [maxInvites, setMaxInvites] = useState(5)
 
   return (
-    <div>
-      <div>{`Of course ${user.name}! Let's find you some people!`}</div>
+    <div style={styles.container}>
+      <div>{`Of course ${user.name}! Let's find you a group!`}</div>
 
-      <div>
-        <div>
-          Can you tell us more about the raid?
-        </div>
-        <br></br>
-        <br></br>
-        <div>
-          <label>Maximum invites</label>
-          <input type="text" value={maxInvites} placeholder="How many people you can invite (up to 5)" onChange={getValueFromEvent(setMaxInvites)} />
-        </div>
-        <div>
-          <label>Raid location</label>
-          <input type="text" value={location} placeholder="The raid location. Optional" onChange={getValueFromEvent(setLocation)} />
-          <div><small>Please be careful here, I have 0 validation for these fields. Don't break my server.</small></div>
-        </div>
-        <br></br>
-        <br></br>
-        <div>
-          <form>
-            <div >
-              {
-                AVAILABLE_BOSSES.map((boss) => (
-                  <div key={boss}>
-                    <button disabled={!socketReady} onClick={(e) => { e.preventDefault(); addRaidToQueue(boss, maxInvites, location) }}>{boss}</button>
-                  </div>
-                ))
-              }
+      {
+        !hasSelected && (
+          <>
+
+            <div>
+              Which pokemon do you want to raid against?
             </div>
-          </form>
-        </div>
-      </div>
+
+            <div style={styles.separator} />
+            <div style={styles.list}>
+              <PokemonList
+                pokemonList={activeRaids} selected={selected} setSelected={setSelected} />
+            </div>
+
+            <div style={styles.separator} />
+            <Button selected={selected !== null} onClick={() => setHasSelected(selected !== null)} >{selected ? `Select ${selected.name}` : "Select a Pokemon!"}</Button>
+          </>
+        )
+      }
+
+      {
+        hasSelected && (
+          <>
+            <div style={styles.tagline}>How many trainers can you invite?</div>
+            <div style={styles.maxInvites}>{maxInvites}</div>
+            <Slider min={1} max={5} value={maxInvites} onChange={setMaxInvites} handleStyle={styles.dot} dotStyle={styles.dot} trackStyle={styles.track} />
+            <button style={{ ...styles.selectButton, ...(selected !== null ? {} : styles.buttonUnavailable) }} onClick={() => addRaidToQueue(selected, maxInvites)} >{`Create raid for ${selected.name}`}</button>
+          </>
+        )
+      }
     </div>
   )
 }
