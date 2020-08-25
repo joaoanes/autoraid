@@ -149,7 +149,7 @@ export const Autoraid = (props) => {
         </div>
         <div style={styles.footerContainer}>
           <footer style={styles.footer}>
-            <small>{"Autoraid 2020 (wooloo v.0.1.1 cyndaquil v.1.0.4)"}</small>
+            <small>{"Autoraid 2020 (wooloo v.1.0.0 cyndaquil v.1.0.4)"}</small>
             <small>built with &lt;3 by <a style={styles.link} href="https://www.github.com/joaoanes">@joaoanes</a></small>
             {socket && <div style={{ ...styles.socket, ...(ready ? { opacity: 1 } : { animation: "fade infinite 0.5s alternate backwards" }), ...(socketError ? styles.error : {}) }}><img src="/connected.svg" /></div>}
           </footer>
