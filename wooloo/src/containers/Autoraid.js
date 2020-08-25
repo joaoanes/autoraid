@@ -216,6 +216,7 @@ const styles = {
   },
   contentContainer: {
     flex: 1,
+    justifyContent: "center",
     display: "flex",
   },
   footerContainer: {
@@ -225,6 +226,7 @@ const styles = {
   appContainer: {
     display: "flex",
     flexDirection: "column",
+    alignSelf: "center",
     maxWidth: 920,
     flexGrow: 1,
   },
