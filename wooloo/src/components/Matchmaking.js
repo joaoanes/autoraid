@@ -27,7 +27,7 @@ const Matchmaking = ({ _stats, _started_at, activeSearch, ownedRaid, currentStat
         </div>
       </div>
 
-      <div style={styles.instructionsHeader}>You can open the game now.</div>
+      <div style={styles.instructionsHeader}>You can open the game now!</div>
       <div style={styles.instructions}>{
         ownedRaid ? "You will be matched into a room and people will add you. Accept and invite them."
           : "A notification will tell you when the raid is ready, and will show the FC you need to add to your friends list. They will invite you in."
@@ -64,7 +64,8 @@ const styles = {
     display: "flex",
   },
   instructionsHeader: {
-    marginTop: 60,
+    marginTop: 20,
+    fontSize: 20,
   },
   header: {
     display: "flex",
@@ -78,7 +79,6 @@ const styles = {
   tagLine: {
     fontSize: 20,
     fontWeight: 700,
-    marginTop: 20,
   },
   instructions: {
     marginTop: 5,
@@ -90,7 +90,7 @@ const styles = {
 
   container: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
     display: "flex",
     flexDirection: "column",
   },

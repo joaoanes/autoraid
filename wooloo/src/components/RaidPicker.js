@@ -2,6 +2,7 @@ import React, { useState } from "react"
 
 import Button from "./ui/Button"
 import PokemonList from "./ui/PokemonList"
+import { PokemonPicker } from "./ui/PokemonPicker"
 
 const AVAILABLE_BOSSES = [
   "Oshawott",
@@ -34,32 +35,24 @@ const AVAILABLE_BOSSES = [
 const RaidPicker = ({ user, addToQueue, activeRaids }) => {
 
   const [selected, setSelected] = useState(null)
-  const [hasSelected, setHasSelected] = useState(false)
-  const [maxInvites, setMaxInvites] = useState(5)
 
   return (
     <div style={styles.container}>
       <div>{`Of course ${user.name}! Let's find you a group!`}</div>
 
-      {
-        !hasSelected && (
-          <>
+      <div>
+        Which pokemon do you want to raid against?
+      </div>
 
-            <div>
-              Which pokemon do you want to raid against?
-            </div>
+      <div style={styles.separator} />
+      <PokemonPicker
+        select={addToQueue}
+        pokemonList={activeRaids}
+        selected={selected}
+        setSelected={setSelected}
+        buttonText={selected ? `Look for a ${selected.name} raid!` : "Select a Pokemon!"}
+      />
 
-            <div style={styles.separator} />
-            <div style={styles.list}>
-              <PokemonList pokemonList={activeRaids} selected={selected} setSelected={setSelected} />
-            </div>
-
-            <div style={styles.separator} />
-            <Button selected={selected !== null} onClick={() => addToQueue(selected)} >{selected ? `Look for a ${selected.name} raid!` : "Select a Pokemon!"}</Button>
-
-          </>
-        )
-      }
     </div>
   )
 }
@@ -71,7 +64,6 @@ export const styles = {
     marginTop: 20,
     fontSize: 18,
     fontWeight: 700,
-    width: "80%",
     border: "1px solid white",
     borderRadius: 20,
     color: "white",
@@ -85,13 +77,9 @@ export const styles = {
     flexDirection: "column",
     alignItems: "center",
     width: "80%",
+    height: "100%",
     marginLeft: "auto",
     marginRight: "auto",
-  },
-  list: {
-    height: 500,
-    overflowY: "scroll",
-    overflowX: "hidden",
   },
   separator: {
     border: "1px solid white",

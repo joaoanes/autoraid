@@ -1,8 +1,8 @@
 import React from "react"
 
-const Button = ({ selected, children, onClick }) =>
+const Button = ({ selected, children, onClick, superStyles }) =>
 
-  <button style={{ ...styles.selectButton, ...(selected ? {} : styles.buttonUnavailable) }}
+  <button style={{ ...styles.selectButton, ...(selected ? {} : styles.buttonUnavailable), ...(superStyles) }}
     onClick={() => onClick ? onClick() : () => (null)}
   >
     {children}
@@ -12,16 +12,15 @@ const styles = {
   selectButton: {
     backgroundColor: "unset",
     padding: 20,
-    marginTop: 20,
     fontSize: 18,
     fontWeight: 700,
-    width: "80%",
-    border: "1px solid white",
+
+    border: "2px solid white",
     borderRadius: 20,
     color: "white",
   },
   buttonUnavailable: {
-    border: "1px solid grey",
+    border: "2px solid grey",
     color: "grey",
   },
 }

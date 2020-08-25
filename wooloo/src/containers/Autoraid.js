@@ -8,8 +8,9 @@ import Home from "../components/Home"
 import Login from "../components/Login"
 import Header from "../components/Header"
 import Room from "../components/Room"
+import Faq from "../components/Faqs"
 import { socketForQueues, addUserToQueue, addRaidToQueue } from "../lib/ws"
-import { setNotification, hasPermission, setupPWAInstall, confirmPWAInstall } from "../lib/notifications"
+import { setNotification, hasPermission } from "../lib/notifications"
 import RaidCreator from "../components/RaidCreator"
 import { getRaidList } from "../lib/pokemonList"
 
@@ -21,6 +22,7 @@ const stateMapping = {
   raidCreator: RaidCreator,
   matchmaking: Matchmaking,
   room: Room,
+  faq: Faq,
 }
 
 const setUserPermanent = (stateChanger) => (user) => {
@@ -29,7 +31,6 @@ const setUserPermanent = (stateChanger) => (user) => {
 }
 
 const messageHandler = (setCurrentStats, setActiveRoom) => (message) => {
-  console.log(message, "wooo")
   const { data, type } = message
 
   switch (type) {
@@ -66,7 +67,7 @@ const setAppState = (setInnerAppState, requireSocket, socket) => (newAppState) =
   if (newAppState === "login") {
     hasPermission()
   }
-  if (["init", "login"].indexOf(newAppState) === -1) {
+  if (["init", "login", "faq"].indexOf(newAppState) === -1) {
     if (!socket) { requireSocket() }
   }
 }
@@ -87,11 +88,6 @@ const stop = () => {
   window.location.reload()
 }
 
-const installPWA = (prompt, setAccepted) => {
-
-  confirmPWAInstall(prompt, setAccepted)
-}
-
 const Background = ({ matchmaking }) => (
   <div style={styles.backgroundContainer}>
     <img style={{ ...styles.backgroundLogo, ...(matchmaking ? styles.matchmaking : {}) }} src="/logo512.png" />
@@ -101,7 +97,7 @@ const Background = ({ matchmaking }) => (
 
 // Shit, I accidentally built a stateful router.
 export const Autoraid = (props) => {
-  const { state, ...extraProps } = props
+  const { state } = props
   const [user, setInnerUser] = useState(getUser())
   const [socketOrError, setSocketOrError] = useState({})
   const [appState, setInnerAppState] = useState(state || "init")
@@ -110,9 +106,6 @@ export const Autoraid = (props) => {
 
   const [currentStats, setCurrentStats] = useState(null)
   const [activeRoom, setRoom] = useState(null)
-
-  const [prompt, setPrompt] = useState(null)
-  const [acceptedInstall, setAccepted] = useState(false)
 
   const [activeRaids, setActiveRaids] = useState(null)
 
@@ -127,8 +120,6 @@ export const Autoraid = (props) => {
   const localSetAppState = setAppState(setInnerAppState, requireSocket(localSetSocketOrError, setCurrentStats, setActiveRoom(setInnerAppState, setRoom)))
   const localAddToQueue = addToQueue(socket, setActiveSearch, localSetAppState, user)
   const localRaidToQueue = raidToQueue(socket, setOwnedRaid, localSetAppState, user)
-
-  useEffect(() => setupPWAInstall(setPrompt))
 
   useEffect(() => {
     if (activeRoom) {
@@ -148,39 +139,30 @@ export const Autoraid = (props) => {
   }, [])
 
   return (
-    <div style={styles.appContainer}>
-
-      <Header user={user} setAppState={setAppState} />
-      <StateComponent activeRaids={activeRaids} stop={stop} ownedRaid={ownedRaid} currentStats={currentStats} socketReady={ready} user={user} addRaidToQueue={localRaidToQueue} addToQueue={localAddToQueue} activeSearch={activeSearch} setUser={setUserPermanent(setInnerUser)} setAppState={localSetAppState} />
-      {prompt && !acceptedInstall && <button onClick={() => installPWA(prompt, setAccepted)}>Add to homescreen</button>}
-      {prompt && acceptedInstall && <div>{"Thank you! <3"}</div>}
-
-      <footer style={styles.footer}>
-        <small>{"Autoraid 2020 (wooloo v.0.1.1 cyndaquil v.1.0.4)"}</small>
-        <small>built with &lt;3 by <a style={styles.link} href="https://www.github.com/joaoanes">@joaoanes</a></small>
-        {socket && <div style={{ ...styles.socket, ...(ready ? { opacity: 1 } : { animation: "fade infinite 0.5s alternate backwards" }), ...(socketError ? styles.error : {}) }}><img src="/connected.svg" /></div>}
-      </footer>
-      <Background matchmaking={activeSearch || ownedRaid} />
+    <div style={styles.app}>
+      <div style={styles.appContainer}>
+        <div style={styles.headerContainer}>
+          <Header user={user} setAppState={setAppState} />
+        </div>
+        <div style={styles.contentContainer}>
+          <StateComponent activeRaids={activeRaids} stop={stop} ownedRaid={ownedRaid} currentStats={currentStats} socketReady={ready} user={user} addRaidToQueue={localRaidToQueue} addToQueue={localAddToQueue} activeSearch={activeSearch} setUser={setUserPermanent(setInnerUser)} setAppState={localSetAppState} />
+        </div>
+        <div style={styles.footerContainer}>
+          <footer style={styles.footer}>
+            <small>{"Autoraid 2020 (wooloo v.0.1.1 cyndaquil v.1.0.4)"}</small>
+            <small>built with &lt;3 by <a style={styles.link} href="https://www.github.com/joaoanes">@joaoanes</a></small>
+            {socket && <div style={{ ...styles.socket, ...(ready ? { opacity: 1 } : { animation: "fade infinite 0.5s alternate backwards" }), ...(socketError ? styles.error : {}) }}><img src="/connected.svg" /></div>}
+          </footer>
+        </div>
+        <Background matchmaking={activeSearch || ownedRaid} />
+      </div>
     </div>
   )
 }
 
 const styles = {
   // background
-  backgroundContainer: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    background: "linear-gradient(230deg, #15234B 0%, #0A1733 100%)",
-    zIndex: -200,
-  },
-  appContainer: {
-    display: "flex",
-    flexDirection: "column",
-    maxWidth: 920,
-  },
+
   backgroundLogo: {
     position: "absolute",
     left: "-18%",
@@ -215,15 +197,41 @@ const styles = {
     bottom: "-8%",
     left: "-8%",
   },
-  // component
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
+  app: {
     display: "flex",
     flexDirection: "column",
-    padding: 10,
-    width: "100%",
+    height: "100%",
+  },
+  // component
+  backgroundContainer: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: "linear-gradient(230deg, #15234B 0%, #0A1733 100%)",
+    zIndex: -200,
+  },
+  headerContainer: {
+  },
+  contentContainer: {
+    flex: 1,
+    display: "flex",
+  },
+  footerContainer: {
+
+    flexBasis: 50,
+  },
+  appContainer: {
+    display: "flex",
+    flexDirection: "column",
+    maxWidth: 920,
+    flexGrow: 1,
+  },
+  footer: {
+    display: "flex",
+    flexDirection: "column",
+    margin: 5,
   },
   link: {
     color: "orange",
@@ -232,7 +240,7 @@ const styles = {
     width: 40,
     fill: "white",
     position: "absolute",
-    right: 20,
+    right: 5,
     opacity: 0.2,
     bottom: 0,
   },

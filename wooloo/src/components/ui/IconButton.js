@@ -1,19 +1,34 @@
 import React from "react"
 import { merge } from "lodash"
 
-const IconButton = ({ icon, children, onClick, selected }) => {
-  const steel = { ...styles.buttonContainer, ...(selected ? styles._selected : {}) }
+const IconButton = ({ icon, children, onClick, selected, superStyles }) => {
+  const steel = { ...styles.buttonContainer, ...(selected ? styles._selected : {}), ...(superStyles) }
 
   console.log(children, steel)
   return (
     <button className="toggleable" style={steel} onClick={onClick ? onClick : () => null}>
       {icon ? <img src={icon} style={styles.icon}></img> : null}
-      <div style={styles.bodyContainer}>{children}</div>
+      {
+        children && <div style={styles.bodyHolder}>
+          <div style={styles.bodyContainer}>{children}</div>
+        </div>
+      }
     </button>
   )
 }
 
 const styles = {
+  bodyHolder: {
+    position: "absolute",
+    bottom: 0,
+    height: 45,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: 700,
+  },
   buttonContainer: {
     width: 100,
     height: 120,
@@ -26,12 +41,15 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     fontFamily: "Lato",
+    justifyContent: "space-around",
+    overflow: "hidden",
+    position: "relative",
   },
   icon: {
-    width: 80,
-    height: 80,
+    maxWidth: "120%",
     left: "auto",
     right: "auto",
+    top: -20,
     position: "relative",
   },
 

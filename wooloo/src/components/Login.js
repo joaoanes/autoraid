@@ -1,10 +1,7 @@
 import React, { useState } from "react"
 import { every } from "lodash"
 import { getValueFromEvent } from "../lib/junkyard"
-import { setNotification } from "../lib/notifications"
 
-import Slider, { Range } from "rc-slider"
-import "rc-slider/assets/index.css"
 import Button from "./ui/Button"
 
 const checkAndGo = (name, fc, level, setUser, setAppState) => {
@@ -55,12 +52,21 @@ const Login = ({ setUser, setAppState }) => {
         <input style={styles.input} type="text" value={level} placeholder="Your level" onChange={getValueFromEvent(setLevel)} />
         <small>This information is ONLY saved on your cellphone. All data you send is eventually deleted after a couple of minutes.</small>
       </div>
-      <Button selected={localIsReady} onClick={() => checkAndGo(name, fc, level, setUser, setAppState)}>{localIsReady ? "Let's get raiding!" : "Please fill in above"}</Button>
+      <div style={styles.buttonContainer}>
+        <Button selected={localIsReady} onClick={() => checkAndGo(name, fc, level, setUser, setAppState)}>{localIsReady ? "Let's get raiding!" : "Please fill in above"}</Button>
+      </div>
     </div>
   )
 }
 
 const styles = {
+  buttonContainer: {
+    display: "flex",
+    marginTop: "auto",
+    marginBottom: "auto",
+    width: "100%",
+    justifyContent: "center",
+  },
   inputContainer: {
     display: "flex",
     flexDirection: "column",
@@ -69,6 +75,7 @@ const styles = {
   },
   container: {
     width: "80%",
+    height: "100%",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",

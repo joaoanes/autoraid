@@ -4,9 +4,7 @@ import "./App.css"
 import { Autoraid } from "./containers/Autoraid"
 
 const App = () => (
-  <div className="App">
-    <Autoraid/>
-  </div>
+  <Autoraid />
 )
 
 export default App

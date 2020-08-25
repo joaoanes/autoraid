@@ -1,10 +1,9 @@
 import React, { useState } from "react"
-import Slider, { Range } from "rc-slider"
+import Slider from "rc-slider"
 import "rc-slider/assets/index.css"
 
 import { styles } from "./RaidPicker"
-import Button from "./ui/Button"
-import PokemonList from "./ui/PokemonList"
+import PokemonPicker from "./ui/PokemonPicker"
 
 const RaidCreator = ({ user, addRaidToQueue, activeRaids }) => {
 
@@ -25,13 +24,8 @@ const RaidCreator = ({ user, addRaidToQueue, activeRaids }) => {
             </div>
 
             <div style={styles.separator} />
-            <div style={styles.list}>
-              <PokemonList
-                pokemonList={activeRaids} selected={selected} setSelected={setSelected} />
-            </div>
-
-            <div style={styles.separator} />
-            <Button selected={selected !== null} onClick={() => setHasSelected(selected !== null)} >{selected ? `Select ${selected.name}` : "Select a Pokemon!"}</Button>
+            <PokemonPicker
+              pokemonList={activeRaids} selected={selected} setSelected={setSelected} select={() => setHasSelected(selected !== null)} buttonText={selected ? `Select ${selected.name}` : "Select a Pokemon!"} />
           </>
         )
       }
