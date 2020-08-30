@@ -72,15 +72,15 @@ const setAppState = (setInnerAppState, requireSocket, socket) => (newAppState) =
   }
 }
 
-const addToQueue = (socket, setActiveSearch, setAppState, me) => ({ name, dexEntry }) => {
-  addUserToQueue(socket, name, me)
-  setActiveSearch({ bossName: name, dexEntry })
+const addToQueue = (socket, setActiveSearch, setAppState, me) => (mon) => {
+  addUserToQueue(socket, mon.name, me)
+  setActiveSearch(mon)
   setAppState("matchmaking")
 }
 
-const raidToQueue = (socket, setOwnedRaid, setAppState, me) => ({ name, dexEntry }, maxInvites, location) => {
-  addRaidToQueue(socket, name, location, maxInvites, me)
-  setOwnedRaid({ dexEntry, bossName: name })
+const raidToQueue = (socket, setOwnedRaid, setAppState, me) => (mon, maxInvites, location) => {
+  addRaidToQueue(socket, mon.name, location, maxInvites, me)
+  setOwnedRaid(mon)
   setAppState("matchmaking")
 }
 

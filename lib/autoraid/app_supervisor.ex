@@ -2,35 +2,12 @@ defmodule Autoraid.AppSupervisor do
   # Automatically defines child_spec/1
   use Supervisor
 
-  @bosses [
-    "Oshawott",
-    "Klink",
-    "Wailmer",
-    "Shinx",
-    "Sandshrew",
-    "Magikarp",
-    "Prinplup",
-    "Mawile",
-    "Gligar",
-    "Breloom",
-    "Marowak",
-    "Kingler",
-    "Onix",
-    "Vaporeon",
-    "Donphan",
-    "Raichu",
-    "Claydol",
-    "Machamp",
-    "Weezing",
-    "Golem",
-    "Tyranitar",
-    "Rhydon",
-    "Excadrill",
-    "Marowak",
-    "Heatran"
-  ]
+  @bosses File.read("priv/boss_registry.json") |> Autoraid.Junkyard.ok! |> Jason.decode! |> Map.keys
 
   def start_link(init_arg) do
+    IO.inspect "Started AppSupervisor with bosses"
+    IO.inspect @bosses
+
     Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
   end
 

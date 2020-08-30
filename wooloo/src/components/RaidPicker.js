@@ -4,34 +4,6 @@ import Button from "./ui/Button"
 import PokemonList from "./ui/PokemonList"
 import { PokemonPicker } from "./ui/PokemonPicker"
 
-const AVAILABLE_BOSSES = [
-  "Oshawott",
-  "Klink",
-  "Wailmer",
-  "Shinx",
-  "Sandshrew",
-  "Magikarp",
-  "Prinplup",
-  "Mawile",
-  "Gligar",
-  "Breloom",
-  "Marowak",
-  "Kingler",
-  "Onix",
-  "Vaporeon",
-  "Donphan",
-  "Raichu",
-  "Claydol",
-  "Machamp",
-  "Weezing",
-  "Golem",
-  "Tyranitar",
-  ",Rhydon",
-  "Excadrill",
-  "Marowak",
-  "Heatran",
-]
-
 const RaidPicker = ({ user, addToQueue, activeRaids }) => {
 
   const [selected, setSelected] = useState(null)
@@ -50,7 +22,7 @@ const RaidPicker = ({ user, addToQueue, activeRaids }) => {
         pokemonList={activeRaids}
         selected={selected}
         setSelected={setSelected}
-        buttonText={selected ? `Look for a ${selected.name} raid!` : "Select a Pokemon!"}
+        buttonText={selected ? `Look for a ${selected.boss_name} raid!` : "Select a Pokemon!"}
       />
 
     </div>

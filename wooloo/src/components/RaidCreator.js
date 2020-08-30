@@ -25,7 +25,7 @@ const RaidCreator = ({ user, addRaidToQueue, activeRaids }) => {
 
             <div style={styles.separator} />
             <PokemonPicker
-              pokemonList={activeRaids} selected={selected} setSelected={setSelected} select={() => setHasSelected(selected !== null)} buttonText={selected ? `Select ${selected.name}` : "Select a Pokemon!"} />
+              pokemonList={activeRaids} selected={selected} setSelected={setSelected} select={() => setHasSelected(selected !== null)} buttonText={selected ? `Select ${selected.boss_name}` : "Select a Pokemon!"} />
           </>
         )
       }

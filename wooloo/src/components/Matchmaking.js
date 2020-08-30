@@ -1,16 +1,18 @@
 import React from "react"
+
+import { getIcon } from '../lib/pokemonIcons'
 import Button from "./ui/Button"
 
 const Matchmaking = ({ _stats, _started_at, activeSearch, ownedRaid, currentStats, stop }) => {
-  const { bossName, dexEntry } = activeSearch ? activeSearch : ownedRaid
-  const stats = (currentStats || { [bossName]: { queued: "??", rooms: "??" } })[bossName]
+  const { boss_name, dex_number, form } = activeSearch ? activeSearch : ownedRaid
+  const stats = (currentStats || { [boss_name]: { queued: "??", rooms: "??" } })[boss_name]
 
   return (
     <div style={styles.container}>
       <div style={styles.tagLine}>We're finding you some trainers!</div>
       <div style={styles.header}>
-        <span>{(`Finding ${ownedRaid ? "users" : "raids"} for ${bossName}`)}</span>
-        <img style={styles.bossImg} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexEntry}.png`} />
+        <span>{(`Finding ${ownedRaid ? "users" : "raids"} for ${boss_name}`)}</span>
+        <img style={styles.bossImg} src={getIcon({dex_number, form})}ß />
       </div>
 
       <div style={styles.stats}>

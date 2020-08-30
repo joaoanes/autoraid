@@ -1,8 +1,9 @@
 import React from "react"
 import { map, reverse, merge } from "lodash"
 import IconButton from "./IconButton"
+import { getIcon } from '../../lib/pokemonIcons'
 
-const TEST_BOSSES = { "5": [{ name: "MISSINGNO", dexEntry: 151 }] }
+const TEST_BOSSES = { "5": [{ name: "MISSINGNO", dex_number: 151 }], "mega": [{ name: "Charizard", dex_number: 6, form: "X" }] }
 
 export const PokemonList = (props) => {
   const pokemonList = props.pokemonList || TEST_BOSSES
@@ -21,18 +22,21 @@ export const PokemonList = (props) => {
                 <div style={merge(styles.separator, styles.number)} key={star}></div>
                 <div style={styles.pokemonContainer}>
                   {
-                    mons.map(({ dexEntry, name, possibleShiny }) =>
-                      <div key={dexEntry} style={{ marginBottom: 10 }}>
+                    mons.map((mon) => {
+                      const { dex_number, boss_name, possible_shiny} = mon
+                      return (
+                        <div key={dex_number} style={{ marginBottom: 10 }}>
                         <IconButton
-                          key={dexEntry}
-                          selected={selected ? dexEntry === selected.dexEntry : false}
-                          onClick={() => setSelected({ dexEntry, name })}
-                          icon={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexEntry}.png`}
+                          key={dex_number}
+                          selected={selected ? boss_name === selected.boss_name : false}
+                          onClick={() => setSelected(mon)}
+                          icon={getIcon(mon)}
                         >
-                          {name + (possibleShiny ? "*" : "")}
+                          {boss_name + (possible_shiny ? "*" : "")}
                         </IconButton>
-                      </div>,
-                    )
+                      </div>
+                      )
+                    })
                   }
                 </div>
 

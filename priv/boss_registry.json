@@ -1,0 +1,320 @@
+{
+  "Oshawott": {
+    "dex_number": 501,
+    "name": "Oshawott",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": false,
+    "max_boosted_cp": 747,
+    "min_boosted_cp": 689,
+    "max_unboosted_cp": 597,
+    "min_unboosted_cp": 551,
+    "type": [
+      "Water"
+    ]
+  },
+  "Wailmer": {
+    "dex_number": 320,
+    "name": "Wailmer",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 1048,
+    "min_boosted_cp": 974,
+    "max_unboosted_cp": 838,
+    "min_unboosted_cp": 779,
+    "type": [
+      "Water"
+    ]
+  },
+  "Shinx": {
+    "dex_number": 403,
+    "name": "Shinx",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 625,
+    "min_boosted_cp": 572,
+    "max_unboosted_cp": 500,
+    "min_unboosted_cp": 458,
+    "type": [
+      "Electric"
+    ]
+  },
+  "Sandshrew": {
+    "dex_number": 27,
+    "name": "Sandshrew",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 901,
+    "min_boosted_cp": 838,
+    "max_unboosted_cp": 720,
+    "min_unboosted_cp": 670,
+    "type": [
+      "Ground"
+    ]
+  },
+  "Prinplup": {
+    "dex_number": 394,
+    "name": "Prinplup",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 1215,
+    "min_boosted_cp": 1142,
+    "max_unboosted_cp": 972,
+    "min_unboosted_cp": 914,
+    "type": [
+      "Water"
+    ]
+  },
+  "Gligar": {
+    "dex_number": 207,
+    "name": "Gligar",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 1326,
+    "min_boosted_cp": 1250,
+    "max_unboosted_cp": 1061,
+    "min_unboosted_cp": 1000,
+    "type": [
+      "Ground",
+      "Flying"
+    ]
+  },
+  "Marowak": {
+    "dex_number": 105,
+    "name": "Marowak",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 1311,
+    "min_boosted_cp": 1235,
+    "max_unboosted_cp": 1048,
+    "min_unboosted_cp": 988,
+    "type": [
+      "Ground"
+    ]
+  },
+  "Kingler": {
+    "dex_number": 99,
+    "name": "Kingler",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 2020,
+    "min_boosted_cp": 1925,
+    "max_unboosted_cp": 1616,
+    "min_unboosted_cp": 1540,
+    "type": [
+      "Water"
+    ]
+  },
+  "Timburr": {
+    "dex_number": 532,
+    "name": "Timburr",
+    "form": "Normal",
+    "tier": 1,
+    "possible_shiny": true,
+    "max_boosted_cp": 939,
+    "min_boosted_cp": 874,
+    "max_unboosted_cp": 751,
+    "min_unboosted_cp": 699,
+    "type": [
+      "Fighting"
+    ]
+  },
+  "Onix": {
+    "dex_number": 95,
+    "name": "Onix",
+    "form": "Normal",
+    "tier": 3,
+    "possible_shiny": true,
+    "max_boosted_cp": 787,
+    "min_boosted_cp": 725,
+    "max_unboosted_cp": 629,
+    "min_unboosted_cp": 580,
+    "type": [
+      "Rock",
+      "Ground"
+    ]
+  },
+  "Vaporeon": {
+    "dex_number": 134,
+    "name": "Vaporeon",
+    "form": "Normal",
+    "tier": 3,
+    "possible_shiny": true,
+    "max_boosted_cp": 2225,
+    "min_boosted_cp": 2124,
+    "max_unboosted_cp": 1779,
+    "min_unboosted_cp": 1699,
+    "type": [
+      "Water"
+    ]
+  },
+  "Donphan": {
+    "dex_number": 232,
+    "name": "Donphan",
+    "form": "Normal",
+    "tier": 3,
+    "possible_shiny": false,
+    "max_boosted_cp": 2152,
+    "min_boosted_cp": 2055,
+    "max_unboosted_cp": 1722,
+    "min_unboosted_cp": 1644,
+    "type": [
+      "Ground"
+    ]
+  },
+  "Alolan Raichu": {
+    "dex_number": 26,
+    "name": "Raichu",
+    "form": "Alola",
+    "tier": 3,
+    "possible_shiny": false,
+    "max_boosted_cp": 1633,
+    "min_boosted_cp": 1548,
+    "max_unboosted_cp": 1306,
+    "min_unboosted_cp": 1238,
+    "type": [
+      "Electric",
+      "Psychic"
+    ]
+  },
+  "Claydol": {
+    "dex_number": 344,
+    "name": "Claydol",
+    "form": "Normal",
+    "tier": 3,
+    "possible_shiny": true,
+    "max_boosted_cp": 1408,
+    "min_boosted_cp": 1328,
+    "max_unboosted_cp": 1126,
+    "min_unboosted_cp": 1063,
+    "type": [
+      "Ground",
+      "Psychic"
+    ]
+  },
+  "Machamp": {
+    "dex_number": 68,
+    "name": "Machamp",
+    "form": "Normal",
+    "tier": 3,
+    "possible_shiny": true,
+    "max_boosted_cp": 2183,
+    "min_boosted_cp": 2084,
+    "max_unboosted_cp": 1746,
+    "min_unboosted_cp": 1667,
+    "type": [
+      "Fighting"
+    ]
+  },
+  "Rhydon": {
+    "dex_number": 112,
+    "name": "Rhydon",
+    "form": "Normal",
+    "tier": 3,
+    "possible_shiny": true,
+    "max_boosted_cp": 2270,
+    "min_boosted_cp": 2170,
+    "max_unboosted_cp": 1816,
+    "min_unboosted_cp": 1736,
+    "type": [
+      "Ground",
+      "Rock"
+    ]
+  },
+  "Alolan Marowak": {
+    "dex_number": 105,
+    "name": "Marowak",
+    "form": "Alola",
+    "tier": 3,
+    "possible_shiny": false,
+    "max_boosted_cp": 1311,
+    "min_boosted_cp": 1235,
+    "max_unboosted_cp": 1048,
+    "min_unboosted_cp": 988,
+    "type": [
+      "Fire",
+      "Ghost"
+    ]
+  },
+  "Heatran": {
+    "dex_number": 485,
+    "name": "Heatran",
+    "form": "Normal",
+    "tier": 5,
+    "possible_shiny": true,
+    "max_boosted_cp": 2681,
+    "min_boosted_cp": 2573,
+    "max_unboosted_cp": 2145,
+    "min_unboosted_cp": 2058,
+    "type": [
+      "Fire",
+      "Steel"
+    ]
+  },
+  "Mega Venusaur": {
+    "dex_number": 3,
+    "name": "Venusaur",
+    "form": "Normal",
+    "tier": "mega",
+    "possible_shiny": true,
+    "max_boosted_cp": 2641,
+    "min_boosted_cp": 2533,
+    "max_unboosted_cp": 2113,
+    "min_unboosted_cp": 2026,
+    "type": [
+      "Grass",
+      "Poison"
+    ]
+  },
+  "Mega Blastoise": {
+    "dex_number": 9,
+    "name": "Blastoise",
+    "form": "Normal",
+    "tier": "mega",
+    "possible_shiny": true,
+    "max_boosted_cp": 2815,
+    "min_boosted_cp": 2703,
+    "max_unboosted_cp": 2252,
+    "min_unboosted_cp": 2162,
+    "type": [
+      "Water"
+    ]
+  },
+  "Mega Charizard X": {
+    "dex_number": 6,
+    "name": "Charizard",
+    "form": "X",
+    "tier": "mega",
+    "possible_shiny": false,
+    "max_boosted_cp": 2750,
+    "min_boosted_cp": 2639,
+    "max_unboosted_cp": 2200,
+    "min_unboosted_cp": 2111,
+    "type": [
+      "Fire",
+      "Dragon"
+    ]
+  },
+  "Mega Charizard Y": {
+    "dex_number": 6,
+    "name": "Charizard",
+    "form": "Y",
+    "tier": "mega",
+    "possible_shiny": false,
+    "max_boosted_cp": 3182,
+    "min_boosted_cp": 3061,
+    "max_unboosted_cp": 2546,
+    "min_unboosted_cp": 2449,
+    "type": [
+      "Fire",
+      "Flying"
+    ]
+  }
+}
