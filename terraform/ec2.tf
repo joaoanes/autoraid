@@ -1,6 +1,6 @@
 resource "aws_instance" "cyndaquil" {
   ami           = data.aws_ami.ubuntu-bionic.id
-  instance_type = "t3.medium"
+  instance_type = "t3.nano"
   key_name      = aws_key_pair.home.key_name
   security_groups = [
     aws_security_group.https.name,
