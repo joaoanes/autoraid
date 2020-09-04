@@ -4,7 +4,6 @@ import { merge } from "lodash"
 const IconButton = ({ icon, children, onClick, selected, superStyles }) => {
   const steel = { ...styles.buttonContainer, ...(selected ? styles._selected : {}), ...(superStyles) }
 
-  console.log(children, steel)
   return (
     <button className="toggleable" style={steel} onClick={onClick ? onClick : () => null}>
       {icon ? <img src={icon} style={styles.icon}></img> : null}

@@ -18,8 +18,9 @@ defmodule Autoraid.Web.SocketHandler do
       Jason.decode!(json)
       |> Morphix.atomorphiform!()
 
-    %{action: action, me: me, data: data} = payload
-
+    %{action: action} = payload
+    me = Map.get(payload, :me, nil)
+    data = Map.get(payload, :data, nil)
     {:ok, new_state, ret} = handle_action(action, data, me, supervisor)
     # Registry.Autoraid
     # |> Registry.dispatch(state.registry_key, fn(entries) ->
@@ -43,6 +44,9 @@ defmodule Autoraid.Web.SocketHandler do
       :error ->
         :ok
 
+      {:ok, nil} ->
+        nil
+
       {:ok, me} ->
         %{q_pid: q_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
         Autoraid.RaidQueues.remove_from_all(q_pid, me)
@@ -52,6 +56,9 @@ defmodule Autoraid.Web.SocketHandler do
     case Map.fetch(state, :raid) do
       :error ->
         :ok
+
+      {:ok, nil} ->
+        nil
 
       {:ok, raid} ->
         %{r_pid: r_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
@@ -65,19 +72,25 @@ defmodule Autoraid.Web.SocketHandler do
   def handle_action("join", %{queue: queue}, me, supervisor) do
     IO.puts("I could join #{me.name} to #{queue}")
 
-    Registry.Autoraid
+    %{q_pid: q_pid, s_name: s_pid, wr_name: wr_name} =
+      Autoraid.AppSupervisor.process_pids(supervisor)
+
+    wr_name
     |> Registry.register(:websocket, Autoraid.Web.Junkyard.registry_id_from_user(me))
 
-    %{q_pid: q_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
     Autoraid.RaidQueues.put(q_pid, queue, me)
     {:ok, size} = Autoraid.RaidQueues.count(q_pid, queue)
 
-    Registry.Autoraid.Stats
+    s_pid
     |> Registry.register(:websocket, %{})
 
     IO.puts("I did join #{me.name} to #{queue}, size #{size}")
 
     {:ok, %{me: me}, %{type: :join}}
+  end
+
+  def handle_action("boop", _data, _me, _supervisor) do
+    {:ok, %{}, %{beep: :boop}}
   end
 
   def handle_action(
@@ -88,15 +101,17 @@ defmodule Autoraid.Web.SocketHandler do
       ) do
     IO.puts("I could create #{location_name} to #{queue}")
 
-    %{r_pid: r_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
+    %{r_pid: r_pid, s_name: s_pid, wr_name: wr_name} =
+      Autoraid.AppSupervisor.process_pids(supervisor)
+
     raid = Autoraid.Web.Junkyard.raid_from_request(request, me)
     Autoraid.RaidRegistry.put(r_pid, queue, raid)
     {:ok, size} = Autoraid.RaidRegistry.count(r_pid, queue)
 
-    Registry.Autoraid
+    wr_name
     |> Registry.register(:websocket, Autoraid.Web.Junkyard.registry_id_from_user(me))
 
-    Registry.Autoraid.Stats
+    s_pid
     |> Registry.register(:websocket, %{})
 
     IO.puts("I did create #{location_name} to #{queue}, id #{raid.id}, size #{size}")

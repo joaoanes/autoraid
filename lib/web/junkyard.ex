@@ -18,8 +18,10 @@ defmodule Autoraid.Web.Junkyard do
       created_at: 1,
       raid_boss: boss
     }
+    
   end
 
+  @spec registry_id_from_user(atom | %{fc: any, level: any, name: any}) :: binary
   def registry_id_from_user(me) do
     :crypto.hash(:md5, "#{me.name}-#{me.level}-#{me.fc}-woooo") |> Base.encode16()
   end

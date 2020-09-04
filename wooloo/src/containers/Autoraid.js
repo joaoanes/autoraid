@@ -73,13 +73,13 @@ const setAppState = (setInnerAppState, requireSocket, socket) => (newAppState) =
 }
 
 const addToQueue = (socket, setActiveSearch, setAppState, me) => (mon) => {
-  addUserToQueue(socket, mon.name, me)
+  addUserToQueue(socket, mon.boss_name, me)
   setActiveSearch(mon)
   setAppState("matchmaking")
 }
 
 const raidToQueue = (socket, setOwnedRaid, setAppState, me) => (mon, maxInvites, location) => {
-  addRaidToQueue(socket, mon.name, location, maxInvites, me)
+  addRaidToQueue(socket, mon.boss_name, location, maxInvites, me)
   setOwnedRaid(mon)
   setAppState("matchmaking")
 }
@@ -129,7 +129,7 @@ export const Autoraid = (props) => {
 
   useEffect(() => {
     if (activeSearch && currentStats && !activeRoom) {
-      const stats = currentStats[activeSearch.bossName]
+      const stats = currentStats[activeSearch.boss_name]
       setNotification("Searching for raid", `Raids: ${stats.rooms}, People: ${stats.queued}`, "wooloo-raidmatch", false)
     }
   }, [activeSearch, currentStats])

@@ -70,7 +70,6 @@ const styles = {
   },
   buttons: {
     display: "flex",
-    width: 400,
     justifyContent: "space-around",
     marginTop: 40,
   },

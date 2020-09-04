@@ -1,2 +1,2 @@
-  ExUnit.start()
-  Faker.start()
+Faker.start()
+ExUnit.start(capture_log: true)

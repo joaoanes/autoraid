@@ -8,7 +8,7 @@ defmodule Autoraid.Application do
   def start(_type, _args) do
 
     children = [
-      Autoraid.AppSupervisor.child_spec([])
+      Autoraid.AppSupervisor.child_spec(%{})
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,9 +1,10 @@
 const API_WEBSOCKET = "wss://ws.raid.network/ws"
-let global_socket = null
+let global_sockets = {}
+let global_intervals = {}
 
 const getSocket = (address) => (messageHandler, initHandler, closeHandler) => {
-  if (global_socket) {
-    return global_socket
+  if (global_sockets[address]) {
+    return global_sockets[address]
   }
 
   const socket = new WebSocket(`${API_WEBSOCKET}/${address}`, [])
@@ -30,9 +31,14 @@ const getSocket = (address) => (messageHandler, initHandler, closeHandler) => {
     ),
   )
 
-  global_socket = socket
+  global_sockets[address] = socket
+  global_intervals[address] = setInterval(heartbeat(address), 1000)
 
   return socket
+}
+
+const heartbeat = (address) => () => {
+  global_sockets[address].send(JSON.stringify({action: "boop", me: {}, data: {}}))
 }
 
 export const addUserToQueue = (socket, bossName, user) => {

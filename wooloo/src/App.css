@@ -18,7 +18,9 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  overflow-y: hidden;
+  left: 0;
+  right: 0;
+  overflow-x: hidden;
   min-width: 100%;
 }
 

@@ -2,28 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <script type="application/javascript" defer="defer" src="js/application.js"></script>
     <title>
-      My WebSocket App
+      Yo, leave
     </title>
   </head>
   <body>
-    <main id="main"></main>
-    <form>
-      <h1>Who you?</h1>
-      <input type="input" value="Test trainer" id="name">
-      <input type="input" value="40" id="level">
-      <input type="input" value="000000000000" id="fc">
-    </form>
-    <br>
-    <form>
-      <h1>Time to raid?</h1>
-      <input type="submit" value="FUCK YES" id="queue_button">
-    </form>
-
-    <form>
-      <h1>Time to create raid?</h1>
-      <input type="submit" value="FUCK YES" id="create_button">
-    </form>
+    this page intentionally left blank
   </body>
 </html>

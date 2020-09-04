@@ -1,14 +1,13 @@
 defmodule Autoraid.AppSupervisor do
-  # Automatically defines child_spec/1
   use Supervisor
 
   @bosses File.read("priv/boss_registry.json") |> Autoraid.Junkyard.ok! |> Jason.decode! |> Map.keys
 
-  def start_link(init_arg) do
-    IO.inspect "Started AppSupervisor with bosses"
+  def start_link(init_arg, opts \\ []) do
+    IO.inspect "Starting AppSupervisor with bosses"
     IO.inspect @bosses
 
-    Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, init_arg, opts)
   end
 
   def process_pids(supervisor_process) do
@@ -23,16 +22,21 @@ defmodule Autoraid.AppSupervisor do
   end
 
   @impl true
-  def init(_) do
+  def init(%{} = args) do
+    port = case Map.fetch(args, :port) do
+      {:ok, p} -> p
+      :error -> 4000
+    end
+
     children = [
       Autoraid.Supervisor.child_spec(%{
         available_bosses: @bosses,
         interval: 500,
         app_supervisor: self()
       }),
-      Autoraid.Web.Supervisor.child_spec(supervisor: self())
+      Autoraid.Web.Supervisor.child_spec(%{supervisor: self(), port: port})
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_all)
   end
 end

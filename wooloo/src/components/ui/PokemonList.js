@@ -17,7 +17,7 @@ export const PokemonList = (props) => {
             const mons = pokemonList[star]
             if (mons.length === 0) { return null }
             return (
-              <>
+              <div key={star}>
                 <div style={styles.number}>{`${star}*`}</div>
                 <div style={merge(styles.separator, styles.number)} key={star}></div>
                 <div style={styles.pokemonContainer}>
@@ -25,22 +25,21 @@ export const PokemonList = (props) => {
                     mons.map((mon) => {
                       const { dex_number, boss_name, possible_shiny} = mon
                       return (
-                        <div key={dex_number} style={{ marginBottom: 10 }}>
-                        <IconButton
-                          key={dex_number}
-                          selected={selected ? boss_name === selected.boss_name : false}
-                          onClick={() => setSelected(mon)}
-                          icon={getIcon(mon)}
-                        >
-                          {boss_name + (possible_shiny ? "*" : "")}
-                        </IconButton>
-                      </div>
+                        <div key={boss_name} style={{ marginBottom: 10 }}>
+                          <IconButton
+                            selected={selected ? boss_name === selected.boss_name : false}
+                            onClick={() => setSelected(mon)}
+                            icon={getIcon(mon)}
+                          >
+                            {boss_name + (possible_shiny ? "*" : "")}
+                          </IconButton>
+                        </div>
                       )
                     })
                   }
                 </div>
 
-              </>
+              </div>
             )
           })
         }

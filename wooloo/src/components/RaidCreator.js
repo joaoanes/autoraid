@@ -36,7 +36,7 @@ const RaidCreator = ({ user, addRaidToQueue, activeRaids }) => {
             <div style={styles.tagline}>How many trainers can you invite?</div>
             <div style={styles.maxInvites}>{maxInvites}</div>
             <Slider min={1} max={5} value={maxInvites} onChange={setMaxInvites} handleStyle={styles.dot} dotStyle={styles.dot} trackStyle={styles.track} />
-            <button style={{ ...styles.selectButton, ...(selected !== null ? {} : styles.buttonUnavailable) }} onClick={() => addRaidToQueue(selected, maxInvites)} >{`Create raid for ${selected.name}`}</button>
+            <button style={{ ...styles.selectButton, ...(selected !== null ? {} : styles.buttonUnavailable) }} onClick={() => addRaidToQueue(selected, maxInvites)} >{`Create raid for ${selected.boss_name}`}</button>
           </>
         )
       }

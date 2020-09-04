@@ -2,8 +2,8 @@ defmodule Autoraid.Web.Supervisor do
   # Automatically defines child_spec/1
   use Supervisor
 
-  def start_link(init_arg) do
-    Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
+  def start_link(init_arg, opts \\ []) do
+    Supervisor.start_link(__MODULE__, init_arg, opts)
   end
 
   defp dispatch(supervisor_pid) do
@@ -21,8 +21,14 @@ defmodule Autoraid.Web.Supervisor do
     Supervisor.which_children(supervisor)
     |> Enum.reduce(%{}, fn {module, pid, _, _}, acc ->
       case module do
-        Registry.Autoraid -> Map.merge(acc, %{wr_pid: pid})
-        Registry.Autoraid.Stats -> Map.merge(acc, %{s_pid: pid})
+        Registry.Autoraid -> (
+          [{:registered_name, name} | _rest] = Process.info(pid)
+          Map.merge(acc, %{wr_pid: pid, wr_name: name})
+        )
+        Registry.Autoraid.Stats -> (
+          [{:registered_name, name }| _rest] = Process.info(pid)
+          Map.merge(acc, %{s_pid: pid, s_name: name})
+        )
         {:ranch_listener_sup, Autoraid.Web.Router.HTTP} -> Map.merge(acc, %{w_pid: pid})
         _ -> acc
       end
@@ -31,28 +37,34 @@ defmodule Autoraid.Web.Supervisor do
 
   @impl true
   def init(opts) do
-    [supervisor: supervisor] = opts
+    %{supervisor: supervisor, port: port} = opts
 
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: Autoraid.Web.Router,
+
         options: [
           dispatch: dispatch(supervisor),
-          port: 4000,
-
+          port: port,
+          protocol_options: [
+            request_timeout: 1000,
+            shutdown_timeout: 1,
+          ],
         ]
       ),
       Registry.child_spec(
         keys: :duplicate,
-        name: Registry.Autoraid
-      ),
+        name: String.to_atom("registry_#{System.os_time}")
+      )
+      |> Supervisor.child_spec(id: Registry.Autoraid),
       Registry.child_spec(
         keys: :duplicate,
-        name: Registry.Autoraid.Stats
-      ),
+        name: String.to_atom("registry_stats_#{System.os_time}")
+      )
+      |> Supervisor.child_spec(id: Registry.Autoraid.Stats),
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_all)
   end
 end

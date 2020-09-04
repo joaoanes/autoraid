@@ -23,9 +23,9 @@ defmodule Autoraid.Stats do
           interval: interval
         } = state
       ) do
-    %{r_pid: r_pid, q_pid: q_pid} = Autoraid.Supervisor.process_pids(supervisor)
+    %{r_pid: r_pid, q_pid: q_pid, s_name: s_name} = Autoraid.Supervisor.process_pids(supervisor)
 
-    broadcast(available_bosses, r_pid, q_pid)
+    broadcast(available_bosses, r_pid, q_pid, s_name)
 
     schedule_work(interval)
     {:noreply, state}
@@ -36,9 +36,9 @@ defmodule Autoraid.Stats do
         %{available_bosses: available_bosses, app_supervisor: app_supervisor, interval: interval} =
           state
       ) do
-    %{r_pid: r_pid, q_pid: q_pid} = Autoraid.AppSupervisor.process_pids(app_supervisor)
+    %{r_pid: r_pid, q_pid: q_pid, s_name: s_name} = Autoraid.AppSupervisor.process_pids(app_supervisor)
 
-    broadcast(available_bosses, r_pid, q_pid)
+    broadcast(available_bosses, r_pid, q_pid, s_name)
 
     schedule_work(interval)
     {:noreply, state}
@@ -50,16 +50,17 @@ defmodule Autoraid.Stats do
           available_bosses: available_bosses,
           registry_pid: r_pid,
           queues_pid: q_pid,
+          s_name: s_name,
           interval: interval
         } = state
       ) do
-    broadcast(available_bosses, r_pid, q_pid)
+    broadcast(available_bosses, r_pid, q_pid, s_name)
 
     schedule_work(interval)
     {:noreply, state}
   end
 
-  def broadcast(available_bosses, r_pid, q_pid) do
+  def broadcast(available_bosses, r_pid, q_pid, s_name) do
     stats =
       Enum.map(available_bosses, fn boss_name ->
         {:ok, q_count} = Autoraid.RaidQueues.count(q_pid, boss_name)
@@ -73,7 +74,7 @@ defmodule Autoraid.Stats do
       end)
       |> Map.new()
 
-    Registry.Autoraid.Stats
+    s_name
     |> Registry.dispatch(
       :websocket,
       fn registrations ->
