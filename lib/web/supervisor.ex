@@ -43,7 +43,6 @@ defmodule Autoraid.Web.Supervisor do
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: Autoraid.Web.Router,
-
         options: [
           dispatch: dispatch(supervisor),
           port: port,

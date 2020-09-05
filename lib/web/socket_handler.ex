@@ -16,22 +16,14 @@ defmodule Autoraid.Web.SocketHandler do
   def websocket_handle({:text, json}, %{supervisor: supervisor} = state) do
     payload =
       Jason.decode!(json)
-      |> Morphix.atomorphiform!()
+      |> Morphix.atomorphiform!
 
     %{action: action} = payload
     me = Map.get(payload, :me, nil)
     data = Map.get(payload, :data, nil)
     {:ok, new_state, ret} = handle_action(action, data, me, supervisor)
-    # Registry.Autoraid
-    # |> Registry.dispatch(state.registry_key, fn(entries) ->
-    #  for {pid, _} <- entries do
-    #    if pid != self() do
-    #      Process.send(pid, message, [])
-    #    end
-    #  end
-    # end)
 
-    {:reply, {:text, ret |> Jason.encode!()}, Map.merge(new_state, Map.merge(state, %{me: me}))}
+    {:reply, {:text, ret |> Jason.encode!()}, Map.merge(new_state |> Morphix.atomorphiform!, Map.merge(state, %{me: me}))}
   end
 
   def websocket_info(info, state) do
@@ -50,7 +42,7 @@ defmodule Autoraid.Web.SocketHandler do
       {:ok, me} ->
         %{q_pid: q_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
         Autoraid.RaidQueues.remove_from_all(q_pid, me)
-        IO.puts("Removed #{me.name}")
+        Autoraid.Logging.log("ws_conn", "remove_from_queues", %{me: me})
     end
 
     case Map.fetch(state, :raid) do
@@ -63,15 +55,13 @@ defmodule Autoraid.Web.SocketHandler do
       {:ok, raid} ->
         %{r_pid: r_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
         Autoraid.RaidRegistry.delete(r_pid, raid.raid_boss.name, raid)
-        IO.puts("Removed #{raid.id}")
+        Autoraid.Logging.log("ws_conn", "remove_from_raids", %{raid: raid})
     end
 
     :ok
   end
 
   def handle_action("join", %{queue: queue}, me, supervisor) do
-    IO.puts("I could join #{me.name} to #{queue}")
-
     %{q_pid: q_pid, s_name: s_pid, wr_name: wr_name} =
       Autoraid.AppSupervisor.process_pids(supervisor)
 
@@ -79,12 +69,11 @@ defmodule Autoraid.Web.SocketHandler do
     |> Registry.register(:websocket, Autoraid.Web.Junkyard.registry_id_from_user(me))
 
     Autoraid.RaidQueues.put(q_pid, queue, me)
-    {:ok, size} = Autoraid.RaidQueues.count(q_pid, queue)
 
     s_pid
     |> Registry.register(:websocket, %{})
 
-    IO.puts("I did join #{me.name} to #{queue}, size #{size}")
+    Autoraid.Logging.log("ws_conn", "join", %{me: me, queue: queue})
 
     {:ok, %{me: me}, %{type: :join}}
   end
@@ -95,18 +84,16 @@ defmodule Autoraid.Web.SocketHandler do
 
   def handle_action(
         "create",
-        %{location_name: location_name, boss_name: queue} = request,
+        %{location_name: _location_name, boss_name: queue} = request,
         me,
         supervisor
       ) do
-    IO.puts("I could create #{location_name} to #{queue}")
 
     %{r_pid: r_pid, s_name: s_pid, wr_name: wr_name} =
       Autoraid.AppSupervisor.process_pids(supervisor)
 
     raid = Autoraid.Web.Junkyard.raid_from_request(request, me)
     Autoraid.RaidRegistry.put(r_pid, queue, raid)
-    {:ok, size} = Autoraid.RaidRegistry.count(r_pid, queue)
 
     wr_name
     |> Registry.register(:websocket, Autoraid.Web.Junkyard.registry_id_from_user(me))
@@ -114,7 +101,7 @@ defmodule Autoraid.Web.SocketHandler do
     s_pid
     |> Registry.register(:websocket, %{})
 
-    IO.puts("I did create #{location_name} to #{queue}, id #{raid.id}, size #{size}")
+    Autoraid.Logging.log("ws_conn", "create", raid)
 
     {:ok, %{raid: raid}, %{type: :create, raid: raid}}
   end

@@ -8,13 +8,14 @@ defmodule Autoraid.Application do
   def start(_type, _args) do
 
     children = [
-      Autoraid.AppSupervisor.child_spec(%{})
+      Autoraid.AppSupervisor.child_spec(%{port: 4000})
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one]
-    IO.puts "#{__MODULE__} running"
+
+    Autoraid.Logging.log("start", __MODULE__, %{running: true})
     Supervisor.start_link(children, opts)
   end
 

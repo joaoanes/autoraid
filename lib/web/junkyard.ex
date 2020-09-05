@@ -6,7 +6,7 @@ defmodule Autoraid.Web.Junkyard do
 
     boss =
       case Map.fetch(@name_to_raid_boss, boss_name) do
-        {:ok, boss} -> boss
+        {:ok, boss} -> boss |> Morphix.atomorphiform!()
         any -> any
       end
 
@@ -18,7 +18,7 @@ defmodule Autoraid.Web.Junkyard do
       created_at: 1,
       raid_boss: boss
     }
-    
+
   end
 
   @spec registry_id_from_user(atom | %{fc: any, level: any, name: any}) :: binary

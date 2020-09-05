@@ -177,7 +177,6 @@ defmodule Autoraid.MatchmakerTest do
   end
 
   def with_supervisor(%{}) do
-    port = Enum.random(10000..30000)
     m_pid = start_supervised!({Autoraid.Supervisor, %{available_bosses: ["MISSINGNO", "MEW"], interval: 9, app_supervisor: nil}})
     %{m_pid: m_pid}
   end

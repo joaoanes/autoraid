@@ -4,9 +4,6 @@ defmodule Autoraid.AppSupervisor do
   @bosses File.read("priv/boss_registry.json") |> Autoraid.Junkyard.ok! |> Jason.decode! |> Map.keys
 
   def start_link(init_arg, opts \\ []) do
-    IO.inspect "Starting AppSupervisor with bosses"
-    IO.inspect @bosses
-
     Supervisor.start_link(__MODULE__, init_arg, opts)
   end
 
@@ -25,7 +22,10 @@ defmodule Autoraid.AppSupervisor do
   def init(%{} = args) do
     port = case Map.fetch(args, :port) do
       {:ok, p} -> p
-      :error -> 4000
+      :error -> (
+        Autoraid.Logging.log("start", "default_port_missing", %{})
+        8080
+      )
     end
 
     children = [

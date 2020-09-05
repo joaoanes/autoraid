@@ -46,10 +46,14 @@ defmodule Autoraid.RaidRegistryTest do
 
     test "deletes correctly", %{bucket: bucket, raids: raids} do
       raid = Autoraid.Test.FactoryYard.create("Raid")
+
       assert Autoraid.RaidRegistry.put(bucket, "MISSINGNO", raid) == :ok
 
+      assert {:ok, raids} != Autoraid.RaidRegistry.get(bucket, "MISSINGNO")
+
       assert :ok == Autoraid.RaidRegistry.delete(bucket, "MISSINGNO", raid)
-      assert Autoraid.RaidRegistry.get(bucket, "MISSINGNO") == {:ok, raids}
+
+      assert {:ok, raids} == Autoraid.RaidRegistry.get(bucket, "MISSINGNO")
     end
   end
 end
