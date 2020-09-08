@@ -1,4 +1,4 @@
-defmodule Autoraid.Types do
+defmodule Cyndaquil.Types do
   defmacro __using__(_opts) do
         quote do
           @type user :: %{name: String.t(), fc: 1, level: 1}

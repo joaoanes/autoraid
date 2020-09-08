@@ -1,4 +1,4 @@
-defmodule Autoraid.Web.Junkyard do
+defmodule Cyndaquil.Web.Junkyard do
 
   def raid_from_request(request, leader) do
     %{max_invites: max_invites, location_name: location_name, boss_name: boss_name} = request
@@ -22,11 +22,11 @@ defmodule Autoraid.Web.Junkyard do
   end
 
   def find_boss(boss_name) do
-    boss_list = case Application.get_env(:autoraid, :boss_provider) do
+    boss_list = case Application.get_env(:cyndaquil, :boss_provider) do
       atom when is_atom(atom) -> (
         apply(atom, :bosses, [])
       )
-      _ -> File.read("priv/boss_registry.json") |> Autoraid.Junkyard.ok! |> Jason.decode!
+      _ -> File.read("priv/boss_registry.json") |> Cyndaquil.Junkyard.ok! |> Jason.decode!
     end
 
     case Map.fetch(boss_list, boss_name) do

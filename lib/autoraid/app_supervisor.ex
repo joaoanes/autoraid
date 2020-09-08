@@ -1,7 +1,7 @@
-defmodule Autoraid.AppSupervisor do
+defmodule Cyndaquil.AppSupervisor do
   use Supervisor
 
-  @bosses File.read("priv/boss_registry.json") |> Autoraid.Junkyard.ok! |> Jason.decode! |> Map.keys
+  @bosses File.read("priv/boss_registry.json") |> Cyndaquil.Junkyard.ok! |> Jason.decode! |> Map.keys
 
   def start_link(init_arg, opts \\ []) do
     Supervisor.start_link(__MODULE__, init_arg, opts)
@@ -11,8 +11,8 @@ defmodule Autoraid.AppSupervisor do
     Supervisor.which_children(supervisor_process)
     |> Enum.reduce(%{}, fn {module, pid, _, _}, acc ->
       case module do
-        Autoraid.Supervisor -> Map.merge(acc, Autoraid.Supervisor.process_pids(pid))
-        Autoraid.Web.Supervisor -> Map.merge(acc, Autoraid.Web.Supervisor.process_pids(pid))
+        Cyndaquil.Supervisor -> Map.merge(acc, Cyndaquil.Supervisor.process_pids(pid))
+        Cyndaquil.Web.Supervisor -> Map.merge(acc, Cyndaquil.Web.Supervisor.process_pids(pid))
         _ -> acc
       end
     end)
@@ -23,7 +23,7 @@ defmodule Autoraid.AppSupervisor do
     port = case Map.fetch(args, :port) do
       {:ok, p} -> p
       :error -> (
-        Autoraid.Logging.log("start", "default_port_missing", %{})
+        Cyndaquil.Logging.log("start", "default_port_missing", %{})
         8080
       )
     end
@@ -31,7 +31,7 @@ defmodule Autoraid.AppSupervisor do
     bosses = case Map.fetch(args, :bosses) do
       {:ok, p} -> p
       :error -> (
-        Autoraid.Logging.log("start", "bosses missing", %{})
+        Cyndaquil.Logging.log("start", "bosses missing", %{})
         @bosses
       )
     end
@@ -39,18 +39,18 @@ defmodule Autoraid.AppSupervisor do
     interval = case Map.fetch(args, :interval) do
       {:ok, p} -> p
       :error -> (
-        Autoraid.Logging.log("start", "interval missing", %{})
+        Cyndaquil.Logging.log("start", "interval missing", %{})
         500
       )
     end
 
     children = [
-      Autoraid.Supervisor.child_spec(%{
+      Cyndaquil.Supervisor.child_spec(%{
         available_bosses: bosses,
         interval: interval,
         app_supervisor: self()
       }),
-      Autoraid.Web.Supervisor.child_spec(%{supervisor: self(), port: port})
+      Cyndaquil.Web.Supervisor.child_spec(%{supervisor: self(), port: port})
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

@@ -10,7 +10,7 @@ by adding `autoraid` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:autoraid, "~> 0.1.0"}
+    {:cyndaquil, "~> 0.1.0"}
   ]
 end
 ```

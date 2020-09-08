@@ -1,4 +1,4 @@
-defmodule Autoraid.Logging do
+defmodule Cyndaquil.Logging do
   require Logger
 
   def log(type, dimension, payload) do

@@ -1,4 +1,4 @@
-defmodule Autoraid.Stats do
+defmodule Cyndaquil.Stats do
   use GenServer
   require Logger
 
@@ -23,7 +23,7 @@ defmodule Autoraid.Stats do
           interval: interval
         } = state
       ) do
-    %{r_pid: r_pid, q_pid: q_pid, s_name: s_name} = Autoraid.Supervisor.process_pids(supervisor)
+    %{r_pid: r_pid, q_pid: q_pid, s_name: s_name} = Cyndaquil.Supervisor.process_pids(supervisor)
 
     broadcast(available_bosses, r_pid, q_pid, s_name)
 
@@ -36,7 +36,7 @@ defmodule Autoraid.Stats do
         %{available_bosses: available_bosses, app_supervisor: app_supervisor, interval: interval} =
           state
       ) do
-    %{r_pid: r_pid, q_pid: q_pid, s_name: s_name} = Autoraid.AppSupervisor.process_pids(app_supervisor)
+    %{r_pid: r_pid, q_pid: q_pid, s_name: s_name} = Cyndaquil.AppSupervisor.process_pids(app_supervisor)
 
     broadcast(available_bosses, r_pid, q_pid, s_name)
 
@@ -63,8 +63,8 @@ defmodule Autoraid.Stats do
   def broadcast(available_bosses, r_pid, q_pid, s_name) do
     stats =
       Enum.map(available_bosses, fn boss_name ->
-        {:ok, q_count} = Autoraid.RaidQueues.count(q_pid, boss_name)
-        {:ok, r_count} = Autoraid.RaidRegistry.count(r_pid, boss_name)
+        {:ok, q_count} = Cyndaquil.RaidQueues.count(q_pid, boss_name)
+        {:ok, r_count} = Cyndaquil.RaidRegistry.count(r_pid, boss_name)
 
         {boss_name,
          %{

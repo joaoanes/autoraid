@@ -1,4 +1,4 @@
-defmodule Autoraid.Web.EndpointTest do
+defmodule Cyndaquil.Web.EndpointTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
@@ -20,12 +20,12 @@ defmodule Autoraid.Web.EndpointTest do
 
     @tag :oops
     test "it joins and receives stats", %{conn: conn, ws_pid: ws_pid, q_pid: q_pid} do
-      assert {:ok, 0} == Autoraid.RaidQueues.count(q_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidQueues.count(q_pid, "Mew")
 
       :gun.ws_send(conn, {:text, join_packet() |> Jason.encode!})
       {:ws, {:text, "{\"type\":\"join\"}"}} = :gun.await(conn, ws_pid)
 
-      assert {:ok, 1} == Autoraid.RaidQueues.count(q_pid, "Mew")
+      assert {:ok, 1} == Cyndaquil.RaidQueues.count(q_pid, "Mew")
 
       {:ws, {:text, payload}} = :gun.await(conn, ws_pid)
       
@@ -43,14 +43,14 @@ defmodule Autoraid.Web.EndpointTest do
      end
 
      test "it creates and receives stats", %{conn: conn, ws_pid: ws_pid, r_pid: r_pid} do
-      assert {:ok, 0} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
       :gun.ws_send(conn, {:text, create_packet() |> Jason.encode!})
       {:ws, {:text, payload}} = :gun.await(conn, ws_pid)
 
       %{"raid" => %{"raid_boss" => %{"name" => "Mew"}}} = payload |> Jason.decode!
 
-      assert {:ok, 1} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 1} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
       {:ws, {:text, payload}} = :gun.await(conn, ws_pid)
       
@@ -69,58 +69,58 @@ defmodule Autoraid.Web.EndpointTest do
 
 
      test "empties after creates", %{conn: conn, ws_pid: ws_pid, r_pid: r_pid} do
-      assert {:ok, 0} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
       :gun.ws_send(conn, {:text, create_packet() |> Jason.encode!})
       {:ws, {:text, payload}} = :gun.await(conn, ws_pid)
 
       %{"raid" => %{"raid_boss" => %{"name" => "Mew"}}} = payload |> Jason.decode!
 
-      assert {:ok, 1} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 1} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
       :ok = :gun.shutdown(conn)
       :ok = :gun.flush(conn)
 
       Process.sleep(100)
 
-      assert {:ok, 0} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
      end
 
 
      test "gets stats after join", %{conn: conn, ws_pid: ws_pid, r_pid: r_pid} do
-      assert {:ok, 0} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
       :gun.ws_send(conn, {:text, create_packet() |> Jason.encode!})
       {:ws, {:text, payload}} = :gun.await(conn, ws_pid)
 
       %{"raid" => %{"raid_boss" => %{"name" => "Mew"}}} = payload |> Jason.decode!
 
-      assert {:ok, 1} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 1} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
       :ok = :gun.shutdown(conn)
       :ok = :gun.flush(conn)
 
       Process.sleep(100)
 
-      assert {:ok, 0} == Autoraid.RaidRegistry.count(r_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidRegistry.count(r_pid, "Mew")
 
      end
 
      test "empties after joins", %{conn: conn, ws_pid: ws_pid, q_pid: q_pid} do
-      assert {:ok, 0} == Autoraid.RaidQueues.count(q_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidQueues.count(q_pid, "Mew")
 
       :gun.ws_send(conn, {:text, join_packet() |> Jason.encode!})
       {:ws, {:text, "{\"type\":\"join\"}"}} = :gun.await(conn, ws_pid)
 
-      assert {:ok, 1} == Autoraid.RaidQueues.count(q_pid, "Mew")
+      assert {:ok, 1} == Cyndaquil.RaidQueues.count(q_pid, "Mew")
 
       :ok = :gun.shutdown(conn)
       :ok = :gun.flush(conn)
 
       Process.sleep(100)
 
-      assert {:ok, 0} == Autoraid.RaidQueues.count(q_pid, "Mew")
+      assert {:ok, 0} == Cyndaquil.RaidQueues.count(q_pid, "Mew")
      end
   end
 
@@ -138,23 +138,23 @@ defmodule Autoraid.Web.EndpointTest do
     Application.ensure_all_started(:cowboy)
     Application.ensure_all_started(:telemetry)
 
-    Mix.Config.persist(autoraid: [boss_provider: Autoraid.Test.BossList])
+    Mix.Config.persist(cyndaquil: [boss_provider: Cyndaquil.Test.BossList])
 
     port = Enum.random(10000..30000)
-    a_pid = start_supervised!({Autoraid.AppSupervisor, %{port: port, bosses: bosses(), interval: 1}})
+    a_pid = start_supervised!({Cyndaquil.AppSupervisor, %{port: port, bosses: bosses(), interval: 1}})
 
-    Autoraid.AppSupervisor.process_pids(a_pid)
+    Cyndaquil.AppSupervisor.process_pids(a_pid)
     |> Map.merge(%{a_pid: a_pid, port: port})
   end
 
   def bosses do
-    Autoraid.Test.BossList.bosses() |> Map.keys
+    Cyndaquil.Test.BossList.bosses() |> Map.keys
   end
 
   def create_packet do
     %{
       action: "create", 
-      me: Autoraid.Test.FactoryYard.create("User"), 
+      me: Cyndaquil.Test.FactoryYard.create("User"), 
       data: %{
         boss_name: "Mew", 
         location_name: "Anonymous", 
@@ -166,7 +166,7 @@ defmodule Autoraid.Web.EndpointTest do
   def join_packet do
     %{
       action: "join", 
-      me: Autoraid.Test.FactoryYard.create("User"), 
+      me: Cyndaquil.Test.FactoryYard.create("User"), 
       data: %{
         queue: "Mew"
       }
@@ -174,7 +174,7 @@ defmodule Autoraid.Web.EndpointTest do
   end
 end
 
-defmodule Autoraid.Test.BossList do
+defmodule Cyndaquil.Test.BossList do
   def bosses do
     %{
       "MISSINGNO" => %{

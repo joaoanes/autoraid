@@ -1,9 +1,9 @@
-defmodule Autoraid.MixProject do
+defmodule Cyndaquil.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :autoraid,
+      app: :cyndaquil,
       version: "1.1.1",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -22,7 +22,7 @@ defmodule Autoraid.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Autoraid.Application, []}
+      mod: {Cyndaquil.Application, []}
     ]
   end
 

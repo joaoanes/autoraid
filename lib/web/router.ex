@@ -1,10 +1,10 @@
-defmodule Autoraid.Web.Router do
+defmodule Cyndaquil.Web.Router do
   use Plug.Router
   require EEx
 
   plug Plug.Static,
     at: "/",
-    from: :autoraid
+    from: :cyndaquil
   plug :match
   plug Plug.Parsers,
     parsers: [:json],

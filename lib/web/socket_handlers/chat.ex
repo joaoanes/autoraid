@@ -1,5 +1,5 @@
 
-defmodule Autoraid.Web.SocketHandlers.Chat do
+defmodule Cyndaquil.Web.SocketHandlers.Chat do
   @behaviour :cowboy_websocket
 
   def init(request, [%{supervisor: supervisor}]) do

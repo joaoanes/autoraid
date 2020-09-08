@@ -1,4 +1,4 @@
-defmodule Autoraid.Test.FactoryYard do
+defmodule Cyndaquil.Test.FactoryYard do
 
   def create(factory), do: create(factory, %{})
   def create("Raid", opts) do

@@ -1,4 +1,4 @@
-defmodule Autoraid.Web.SocketHandlers.Queue do
+defmodule Cyndaquil.Web.SocketHandlers.Queue do
   @behaviour :cowboy_websocket
 
   def init(request, [%{supervisor: supervisor}]) do
@@ -40,9 +40,9 @@ defmodule Autoraid.Web.SocketHandlers.Queue do
         nil
 
       {:ok, me} ->
-        %{q_pid: q_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
-        Autoraid.RaidQueues.remove_from_all(q_pid, me)
-        Autoraid.Logging.log("ws_conn", "remove_from_queues", %{me: me})
+        %{q_pid: q_pid} = Cyndaquil.AppSupervisor.process_pids(supervisor)
+        Cyndaquil.RaidQueues.remove_from_all(q_pid, me)
+        Cyndaquil.Logging.log("ws_conn", "remove_from_queues", %{me: me})
     end
 
     case Map.fetch(state, :raid) do
@@ -53,9 +53,9 @@ defmodule Autoraid.Web.SocketHandlers.Queue do
         nil
 
       {:ok, raid} ->
-        %{r_pid: r_pid} = Autoraid.AppSupervisor.process_pids(supervisor)
-        Autoraid.RaidRegistry.delete(r_pid, raid.raid_boss.name, raid)
-        Autoraid.Logging.log("ws_conn", "remove_from_raids", %{raid: raid})
+        %{r_pid: r_pid} = Cyndaquil.AppSupervisor.process_pids(supervisor)
+        Cyndaquil.RaidRegistry.delete(r_pid, raid.raid_boss.name, raid)
+        Cyndaquil.Logging.log("ws_conn", "remove_from_raids", %{raid: raid})
     end
 
     :ok
@@ -63,17 +63,17 @@ defmodule Autoraid.Web.SocketHandlers.Queue do
 
   def handle_action("join", %{queue: queue}, me, supervisor) do
     %{q_pid: q_pid, s_name: s_pid, wr_name: wr_name} =
-      Autoraid.AppSupervisor.process_pids(supervisor)
+      Cyndaquil.AppSupervisor.process_pids(supervisor)
 
     wr_name
-    |> Registry.register(:websocket, Autoraid.Web.Junkyard.registry_id_from_user(me))
+    |> Registry.register(:websocket, Cyndaquil.Web.Junkyard.registry_id_from_user(me))
 
-    Autoraid.RaidQueues.put(q_pid, queue, me)
+    Cyndaquil.RaidQueues.put(q_pid, queue, me)
 
     s_pid
     |> Registry.register(:websocket, %{})
 
-    Autoraid.Logging.log("ws_conn", "join", %{me: me, queue: queue})
+    Cyndaquil.Logging.log("ws_conn", "join", %{me: me, queue: queue})
 
     {:ok, %{me: me}, %{type: :join}}
   end
@@ -90,18 +90,18 @@ defmodule Autoraid.Web.SocketHandlers.Queue do
       ) do
 
     %{r_pid: r_pid, s_name: s_pid, wr_name: wr_name} =
-      Autoraid.AppSupervisor.process_pids(supervisor)
+      Cyndaquil.AppSupervisor.process_pids(supervisor)
 
-    raid = Autoraid.Web.Junkyard.raid_from_request(request, me)
-    Autoraid.RaidRegistry.put(r_pid, queue, raid)
+    raid = Cyndaquil.Web.Junkyard.raid_from_request(request, me)
+    Cyndaquil.RaidRegistry.put(r_pid, queue, raid)
 
     wr_name
-    |> Registry.register(:websocket, Autoraid.Web.Junkyard.registry_id_from_user(me))
+    |> Registry.register(:websocket, Cyndaquil.Web.Junkyard.registry_id_from_user(me))
 
     s_pid
     |> Registry.register(:websocket, %{})
 
-    Autoraid.Logging.log("ws_conn", "create", raid)
+    Cyndaquil.Logging.log("ws_conn", "create", raid)
 
     {:ok, %{raid: raid}, %{type: :create, raid: raid}}
   end

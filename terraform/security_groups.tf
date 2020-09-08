@@ -85,7 +85,7 @@ resource "aws_security_group" "http-ssh" {
 resource "aws_security_group" "autoraid" {
   name                   = "autoraid"
   description            = "autoraid VPC security group"
-  vpc_id                 = aws_vpc.autoraid.id
+  vpc_id                 = aws_vpc.Cyndaquil.id
   revoke_rules_on_delete = "false"
 
   ingress {

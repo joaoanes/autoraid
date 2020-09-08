@@ -1,7 +1,7 @@
-defmodule Autoraid.RaidQueues do
+defmodule Cyndaquil.RaidQueues do
   use Agent
 
-  use Autoraid.Types
+  use Cyndaquil.Types
   @spec start_link :: {:error, any} | {:ok, pid}
   def start_link(), do: start_link(available_bosses: ["MISSINGNO"])
 
@@ -35,17 +35,17 @@ defmodule Autoraid.RaidQueues do
 
   @spec put(atom | pid | {atom, any} | {:via, atom, any}, any, any) :: :ok
   def put(bucket, key, value) do
-    Autoraid.Logging.log("queue", "enter", %{payload: %{queue: key}})
+    Cyndaquil.Logging.log("queue", "enter", %{payload: %{queue: key}})
     Agent.update(bucket, &Map.update!(&1, key, fn users -> users ++ [value] end))
   end
 
   def append(bucket, key, value) do
-    Autoraid.Logging.log("queue", "enter", %{payload: %{queue: key, append: true}})
+    Cyndaquil.Logging.log("queue", "enter", %{payload: %{queue: key, append: true}})
     Agent.update(bucket, &Map.update!(&1, key, fn users -> [value] ++ users end))
   end
 
   def remove_from_all(bucket, value) do
-    Autoraid.Logging.log("queue", "remove", %{payload: %{value: value, all: true}})
+    Cyndaquil.Logging.log("queue", "remove", %{payload: %{value: value, all: true}})
 
     Agent.update(
       bucket,
@@ -56,8 +56,8 @@ defmodule Autoraid.RaidQueues do
             boss,
             queue
             |> Enum.filter(fn user ->
-              Autoraid.Web.Junkyard.registry_id_from_user(user) !=
-                Autoraid.Web.Junkyard.registry_id_from_user(value)
+              Cyndaquil.Web.Junkyard.registry_id_from_user(user) !=
+                Cyndaquil.Web.Junkyard.registry_id_from_user(value)
             end)
           }
         end)
@@ -73,7 +73,7 @@ defmodule Autoraid.RaidQueues do
       end)
       |> Enum.split(num)
 
-    Autoraid.Logging.log("queue", "pop", %{payload: %{queue: key}})
+    Cyndaquil.Logging.log("queue", "pop", %{payload: %{queue: key}})
 
     :ok = Agent.update(bucket, &Map.update!(&1, key, fn _ -> rest end))
     {:ok, users}

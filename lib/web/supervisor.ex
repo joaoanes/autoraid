@@ -1,4 +1,4 @@
-defmodule Autoraid.Web.Supervisor do
+defmodule Cyndaquil.Web.Supervisor do
   # Automatically defines child_spec/1
   use Supervisor
 
@@ -10,9 +10,9 @@ defmodule Autoraid.Web.Supervisor do
     [
       {:_,
         [
-          {"/ws/queues", Autoraid.Web.SocketHandlers.Queue, [%{supervisor: supervisor_pid}]},
-          {"/ws/[...]", Autoraid.Web.SocketHandlers.Chat, [%{supervisor: supervisor_pid}]},
-          {:_, Plug.Cowboy.Handler, {Autoraid.Web.Router, []}}
+          {"/ws/queues", Cyndaquil.Web.SocketHandlers.Queue, [%{supervisor: supervisor_pid}]},
+          {"/ws/[...]", Cyndaquil.Web.SocketHandlers.Chat, [%{supervisor: supervisor_pid}]},
+          {:_, Plug.Cowboy.Handler, {Cyndaquil.Web.Router, []}}
         ]
       }
     ]
@@ -22,15 +22,15 @@ defmodule Autoraid.Web.Supervisor do
     Supervisor.which_children(supervisor)
     |> Enum.reduce(%{}, fn {module, pid, _, _}, acc ->
       case module do
-        Registry.Autoraid -> (
+        Registry.Cyndaquil -> (
           [{:registered_name, name} | _rest] = Process.info(pid)
           Map.merge(acc, %{wr_pid: pid, wr_name: name})
         )
-        Registry.Autoraid.Stats -> (
+        Registry.Cyndaquil.Stats -> (
           [{:registered_name, name }| _rest] = Process.info(pid)
           Map.merge(acc, %{s_pid: pid, s_name: name})
         )
-        {:ranch_listener_sup, Autoraid.Web.Router.HTTP} -> Map.merge(acc, %{w_pid: pid})
+        {:ranch_listener_sup, Cyndaquil.Web.Router.HTTP} -> Map.merge(acc, %{w_pid: pid})
         _ -> acc
       end
     end)
@@ -43,7 +43,7 @@ defmodule Autoraid.Web.Supervisor do
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
-        plug: Autoraid.Web.Router,
+        plug: Cyndaquil.Web.Router,
         options: [
           dispatch: dispatch(supervisor),
           port: port,
@@ -57,12 +57,12 @@ defmodule Autoraid.Web.Supervisor do
         keys: :duplicate,
         name: String.to_atom("registry_#{System.os_time}")
       )
-      |> Supervisor.child_spec(id: Registry.Autoraid),
+      |> Supervisor.child_spec(id: Registry.Cyndaquil),
       Registry.child_spec(
         keys: :duplicate,
         name: String.to_atom("registry_stats_#{System.os_time}")
       )
-      |> Supervisor.child_spec(id: Registry.Autoraid.Stats),
+      |> Supervisor.child_spec(id: Registry.Cyndaquil.Stats),
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

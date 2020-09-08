@@ -1,4 +1,4 @@
-defmodule Autoraid.Supervisor do
+defmodule Cyndaquil.Supervisor do
   # Automatically defines child_spec/1
   use Supervisor
 
@@ -10,9 +10,9 @@ defmodule Autoraid.Supervisor do
     Supervisor.which_children(supervisor)
     |> Enum.reduce(%{}, fn {module, pid, _, _}, acc ->
       case module do
-        Autoraid.RaidQueues -> Map.merge(acc, %{q_pid: pid})
-        Autoraid.RaidRegistry -> Map.merge(acc, %{r_pid: pid})
-        Autoraid.RoomRegistry -> Map.merge(acc, %{ro_pid: pid})
+        Cyndaquil.RaidQueues -> Map.merge(acc, %{q_pid: pid})
+        Cyndaquil.RaidRegistry -> Map.merge(acc, %{r_pid: pid})
+        Cyndaquil.RoomRegistry -> Map.merge(acc, %{ro_pid: pid})
         _ -> (
           acc
         )
@@ -25,15 +25,15 @@ defmodule Autoraid.Supervisor do
     %{available_bosses: available_bosses, interval: interval, app_supervisor: supervisor} = opts
     
     children = [
-      {Autoraid.RaidQueues, [available_bosses: available_bosses]},
-      {Autoraid.RaidRegistry, [available_bosses: available_bosses]},
-      {Autoraid.RoomRegistry, []},
-      {Autoraid.Matchmaker, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: interval}}
+      {Cyndaquil.RaidQueues, [available_bosses: available_bosses]},
+      {Cyndaquil.RaidRegistry, [available_bosses: available_bosses]},
+      {Cyndaquil.RoomRegistry, []},
+      {Cyndaquil.Matchmaker, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: interval}}
     ]
 
     case Map.fetch(opts, :without_stats) do
       {:ok, _} -> children
-      :error -> children ++ [{Autoraid.Stats, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: Integer.floor_div(interval, 4)}},
+      :error -> children ++ [{Cyndaquil.Stats, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: Integer.floor_div(interval, 4)}},
     ]
     end
     |> Supervisor.init(strategy: :one_for_one)

@@ -1,4 +1,4 @@
-defmodule Autoraid.Matchmaker do
+defmodule Cyndaquil.Matchmaker do
   use GenServer
   require Logger
 
@@ -23,7 +23,7 @@ defmodule Autoraid.Matchmaker do
           interval: interval
         } = state
       ) do
-    %{r_pid: r_pid, q_pid: q_pid, ro_pid: ro_pid} = Autoraid.Supervisor.process_pids(supervisor)
+    %{r_pid: r_pid, q_pid: q_pid, ro_pid: ro_pid} = Cyndaquil.Supervisor.process_pids(supervisor)
 
     matchmake(available_bosses, r_pid, q_pid, ro_pid)
 
@@ -37,7 +37,7 @@ defmodule Autoraid.Matchmaker do
           state
       ) do
     %{r_pid: r_pid, q_pid: q_pid, ro_pid: ro_pid, w_pid: _w_pid} =
-      Autoraid.AppSupervisor.process_pids(app_supervisor)
+      Cyndaquil.AppSupervisor.process_pids(app_supervisor)
 
     matchmake(available_bosses, r_pid, q_pid, ro_pid)
     |> broadcast_raid_creation
@@ -65,7 +65,7 @@ defmodule Autoraid.Matchmaker do
   @spec matchmake(any, any, any, any) :: [any]
   def matchmake(available_bosses, r_pid, q_pid, ro_pid) do
     matchmake_rooms(available_bosses, r_pid, q_pid)
-    |> Autoraid.Junkyard.ok!()
+    |> Cyndaquil.Junkyard.ok!()
     |> Enum.flat_map(fn {_boss, rooms} ->
       create_rooms(rooms, q_pid, r_pid, ro_pid)
     end)
@@ -75,9 +75,9 @@ defmodule Autoraid.Matchmaker do
     rooms
     |> Enum.map(fn %{id: _id, raid: %{leader: leader} = raid, members: members} ->
       users_to_warn =
-        ([leader] ++ members) |> Enum.map(&Autoraid.Web.Junkyard.registry_id_from_user/1)
+        ([leader] ++ members) |> Enum.map(&Cyndaquil.Web.Junkyard.registry_id_from_user/1)
 
-      Registry.Autoraid
+      Registry.Cyndaquil
       |> Registry.dispatch(
         :websocket,
         fn registrations ->
@@ -103,9 +103,9 @@ defmodule Autoraid.Matchmaker do
           atom | pid | {atom, any} | {:via, atom, any}
         ) :: %{id: binary, members: any, raid: %{raid_boss: %{name: any}}}
   def create_room(%{raid: %{raid_boss: %{name: boss}} = raid, members: members}, r_pid, ro_pid) do
-    :ok = Autoraid.RaidRegistry.delete(r_pid, boss, raid)
+    :ok = Cyndaquil.RaidRegistry.delete(r_pid, boss, raid)
     room = %{raid: raid, members: members, id: UUID.uuid4()}
-    :ok = Autoraid.RoomRegistry.put(ro_pid, room)
+    :ok = Cyndaquil.RoomRegistry.put(ro_pid, room)
 
     room
   end
@@ -122,9 +122,9 @@ defmodule Autoraid.Matchmaker do
           %{raid: %{raid_boss: %{name: boss}} = raid, members: members} = room_struct
 
           members
-          |> Enum.each(fn user -> :ok = Autoraid.RaidQueues.append(q_pid, boss, user) end)
+          |> Enum.each(fn user -> :ok = Cyndaquil.RaidQueues.append(q_pid, boss, user) end)
 
-          :ok = Autoraid.RaidRegistry.put(r_pid, boss, raid)
+          :ok = Cyndaquil.RaidRegistry.put(r_pid, boss, raid)
 
           # let's not let it crash?
           :ok
@@ -135,8 +135,8 @@ defmodule Autoraid.Matchmaker do
   @spec matchmake_rooms(any, any, any) :: {:error, :processing_failed} | {:ok, any}
   def matchmake_rooms(available_bosses, r_pid, q_pid) do
     Enum.map(available_bosses, fn boss ->
-      {:ok, count} = Autoraid.RaidQueues.count(q_pid, boss)
-      {:ok, raids} = Autoraid.RaidRegistry.get(r_pid, boss)
+      {:ok, count} = Cyndaquil.RaidQueues.count(q_pid, boss)
+      {:ok, raids} = Cyndaquil.RaidRegistry.get(r_pid, boss)
 
       {boss, [count: count, raids: raids]}
     end)
@@ -159,7 +159,7 @@ defmodule Autoraid.Matchmaker do
                    [current_count: count, rooms: rooms] = state ->
                   case count > 0 do
                     true ->
-                      {:ok, users} = Autoraid.RaidQueues.pop(q_pid, boss, m_inv)
+                      {:ok, users} = Cyndaquil.RaidQueues.pop(q_pid, boss, m_inv)
 
                       [
                         current_count: count - m_inv,
@@ -177,7 +177,7 @@ defmodule Autoraid.Matchmaker do
     )
     |> Enum.map(fn {boss, [current_count: _, rooms: rooms]} -> {boss, rooms} end)
     |> Map.new()
-    |> Autoraid.Junkyard.make_ok()
+    |> Cyndaquil.Junkyard.make_ok()
   rescue
     err ->
       Logger.error(Exception.format(:error, err, __STACKTRACE__))

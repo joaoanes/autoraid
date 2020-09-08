@@ -1,4 +1,4 @@
-defmodule Autoraid.Junkyard do
+defmodule Cyndaquil.Junkyard do
   require IEx
   def pry!(x) do
     IEx.pry()
