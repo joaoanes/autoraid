@@ -36,10 +36,18 @@ defmodule Autoraid.AppSupervisor do
       )
     end
 
+    interval = case Map.fetch(args, :interval) do
+      {:ok, p} -> p
+      :error -> (
+        Autoraid.Logging.log("start", "interval missing", %{})
+        500
+      )
+    end
+
     children = [
       Autoraid.Supervisor.child_spec(%{
         available_bosses: bosses,
-        interval: 500,
+        interval: interval,
         app_supervisor: self()
       }),
       Autoraid.Web.Supervisor.child_spec(%{supervisor: self(), port: port})

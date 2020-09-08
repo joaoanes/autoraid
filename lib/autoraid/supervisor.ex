@@ -33,7 +33,7 @@ defmodule Autoraid.Supervisor do
 
     case Map.fetch(opts, :without_stats) do
       {:ok, _} -> children
-      :error -> children ++ [{Autoraid.Stats, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: Integer.floor_div(interval, 2)}},
+      :error -> children ++ [{Autoraid.Stats, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: Integer.floor_div(interval, 4)}},
     ]
     end
     |> Supervisor.init(strategy: :one_for_one)

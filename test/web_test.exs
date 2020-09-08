@@ -141,7 +141,7 @@ defmodule Autoraid.Web.EndpointTest do
     Mix.Config.persist(autoraid: [boss_provider: Autoraid.Test.BossList])
 
     port = Enum.random(10000..30000)
-    a_pid = start_supervised!({Autoraid.AppSupervisor, %{port: port, bosses: bosses()}}, shutdown: 1000)
+    a_pid = start_supervised!({Autoraid.AppSupervisor, %{port: port, bosses: bosses(), interval: 1}})
 
     Autoraid.AppSupervisor.process_pids(a_pid)
     |> Map.merge(%{a_pid: a_pid, port: port})
