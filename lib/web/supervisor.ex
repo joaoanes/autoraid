@@ -10,7 +10,8 @@ defmodule Autoraid.Web.Supervisor do
     [
       {:_,
         [
-          {"/ws/[...]", Autoraid.Web.SocketHandler, [%{supervisor: supervisor_pid}]},
+          {"/ws/queues", Autoraid.Web.SocketHandlers.Queue, [%{supervisor: supervisor_pid}]},
+          {"/ws/[...]", Autoraid.Web.SocketHandlers.Chat, [%{supervisor: supervisor_pid}]},
           {:_, Plug.Cowboy.Handler, {Autoraid.Web.Router, []}}
         ]
       }

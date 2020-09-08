@@ -1,4 +1,4 @@
-defmodule Autoraid.Web.SocketHandler do
+defmodule Autoraid.Web.SocketHandlers.Queue do
   @behaviour :cowboy_websocket
 
   def init(request, [%{supervisor: supervisor}]) do
