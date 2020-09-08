@@ -28,9 +28,17 @@ defmodule Autoraid.AppSupervisor do
       )
     end
 
+    bosses = case Map.fetch(args, :bosses) do
+      {:ok, p} -> p
+      :error -> (
+        Autoraid.Logging.log("start", "bosses missing", %{})
+        @bosses
+      )
+    end
+
     children = [
       Autoraid.Supervisor.child_spec(%{
-        available_bosses: @bosses,
+        available_bosses: bosses,
         interval: 500,
         app_supervisor: self()
       }),

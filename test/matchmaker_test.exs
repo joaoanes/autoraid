@@ -1,6 +1,33 @@
+defmodule Autoraid.MatchmakerTest.Helper do
+  defmacro test_matchmaking do 
+    quote do
+      test "it matchmakes!", %{m_pid: m_pid} do
+        %{r_pid: r_pid, q_pid: q_pid, ro_pid: ro_pid} = Autoraid.Supervisor.process_pids(m_pid)
+
+        with_queued_raids("MISSINGNO", q_pid, r_pid, [Autoraid.Test.FactoryYard.create("Raid")])
+
+        assert {:ok, 0} = Autoraid.RoomRegistry.count(ro_pid)
+        assert {:ok, 7} = Autoraid.RaidQueues.count(q_pid, "MISSINGNO")
+        assert {:ok, 1} = Autoraid.RaidRegistry.count(r_pid, "MISSINGNO")
+
+        # yeah, I don't like this either. but hey, it's short!
+        Process.sleep(50)
+
+        assert {:ok, [
+          %{raid: %{raid_boss: %{name: "MISSINGNO"}}},
+        ]} = Autoraid.RoomRegistry.get(ro_pid)
+      end
+    end
+  end
+
+end
+
 defmodule Autoraid.MatchmakerTest do
+  import Autoraid.MatchmakerTest.Helper
+
   use ExUnit.Case, async: true
 
+  
   describe "matchmake_rooms/3 with full queue" do
       setup [:pids, :with_multiple_queues_and_raids]
 
@@ -35,32 +62,26 @@ defmodule Autoraid.MatchmakerTest do
 
   end
 
-  @tag :this
+  describe "genserver supervisor with stats" do
+    setup [:with_supervisor_with_stats]
+
+    test "it spawns enough resources", %{m_pid: m_pid} do
+      assert [Autoraid.Stats, Autoraid.Matchmaker, Autoraid.RoomRegistry, Autoraid.RaidRegistry, Autoraid.RaidQueues] =
+        Supervisor.which_children(m_pid)
+        |> Enum.map(fn {name, _, _, _} -> name end)
+    end
+  end
+
   describe "genserver supervisor" do
     setup [:with_supervisor]
 
     test "it spawns enough resources", %{m_pid: m_pid} do
-      assert [Autoraid.Matchmaker, Autoraid.Stats, Autoraid.RoomRegistry, Autoraid.RaidRegistry, Autoraid.RaidQueues] =
+      assert [Autoraid.Matchmaker, Autoraid.RoomRegistry, Autoraid.RaidRegistry, Autoraid.RaidQueues] =
         Supervisor.which_children(m_pid)
         |> Enum.map(fn {name, _, _, _} -> name end)
     end
 
-    test "it matchmakes!", %{m_pid: m_pid} do
-      %{r_pid: r_pid, q_pid: q_pid, ro_pid: ro_pid} = Autoraid.Supervisor.process_pids(m_pid)
-
-      with_queued_raids("MISSINGNO", q_pid, r_pid, [Autoraid.Test.FactoryYard.create("Raid")])
-
-      assert {:ok, 0} = Autoraid.RoomRegistry.count(ro_pid)
-      assert {:ok, 7} = Autoraid.RaidQueues.count(q_pid, "MISSINGNO")
-      assert {:ok, 1} = Autoraid.RaidRegistry.count(r_pid, "MISSINGNO")
-
-      # yeah, I don't like this either. but hey, it's short!
-      Process.sleep(50)
-
-      assert {:ok, [
-        %{raid: %{raid_boss: %{name: "MISSINGNO"}}},
-      ]} = Autoraid.RoomRegistry.get(ro_pid)
-    end
+    test_matchmaking()
   end
 
   @tag :long
@@ -177,6 +198,11 @@ defmodule Autoraid.MatchmakerTest do
   end
 
   def with_supervisor(%{}) do
+    m_pid = start_supervised!({Autoraid.Supervisor, %{available_bosses: ["MISSINGNO", "MEW"], interval: 9, app_supervisor: nil, without_stats: "anything"}})
+    %{m_pid: m_pid}
+  end
+
+  def with_supervisor_with_stats(_) do
     m_pid = start_supervised!({Autoraid.Supervisor, %{available_bosses: ["MISSINGNO", "MEW"], interval: 9, app_supervisor: nil}})
     %{m_pid: m_pid}
   end

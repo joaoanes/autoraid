@@ -23,14 +23,19 @@ defmodule Autoraid.Supervisor do
   @impl true
   def init(opts) do
     %{available_bosses: available_bosses, interval: interval, app_supervisor: supervisor} = opts
+    
     children = [
       {Autoraid.RaidQueues, [available_bosses: available_bosses]},
       {Autoraid.RaidRegistry, [available_bosses: available_bosses]},
       {Autoraid.RoomRegistry, []},
-      {Autoraid.Stats, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor}},
       {Autoraid.Matchmaker, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: interval}}
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    case Map.fetch(opts, :without_stats) do
+      {:ok, _} -> children
+      :error -> children ++ [{Autoraid.Stats, %{available_bosses: available_bosses, supervisor: self(), app_supervisor: supervisor, interval: Integer.floor_div(interval, 2)}},
+    ]
+    end
+    |> Supervisor.init(strategy: :one_for_one)
   end
 end
