@@ -4,9 +4,9 @@ import Button from "./ui/Button"
 import PokemonList from "./ui/PokemonList"
 import { PokemonPicker } from "./ui/PokemonPicker"
 
-const RaidPicker = ({ user, addToQueue, activeRaids }) => {
+const RaidPicker = ({ user, addToQueue, activeRaids, initialSelection }) => {
 
-  const [selected, setSelected] = useState(null)
+  const [selected, setSelected] = useState(initialSelection)
 
   return (
     <div style={styles.container}>

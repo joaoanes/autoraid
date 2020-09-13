@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from "react"
 import IconButton from "./ui/IconButton"
 import Button from "./ui/Button"
-import { setupPWAInstall, confirmPWAInstall } from "../lib/notifications"
 
 const routeToNextState = (setAppState, user) => (desired_state) => user ? setAppState(desired_state) : (desired_state === "faq" ? setAppState("faq") : setAppState("login"))
 
-const installPWA = (prompt, setAccepted) => {
-
-  confirmPWAInstall(prompt, setAccepted)
-}
-
-const Home = ({ setAppState, user }) => {
+const Home = ({ setAppState, user, prompt, acceptedInstall, onInstall }) => {
   const router = routeToNextState(setAppState, user)
-
-  const [prompt, setPrompt] = useState(true)
-  const [acceptedInstall, setAccepted] = useState(false)
-
-  useEffect(() => setupPWAInstall(setPrompt))
 
   return (
     <div style={styles.homeContainer}>
@@ -43,7 +32,7 @@ const Home = ({ setAppState, user }) => {
         <Button onClick={() => router("faq")} selected={true} superStyles={{ border: "unset" }}>What is this? (FAQ)</Button>
       </div>}
       <div style={styles.prompt}>
-        {prompt && user && !acceptedInstall && <Button selected={true} onClick={() => installPWA(prompt, setAccepted)}>
+        {prompt && user && !acceptedInstall && <Button selected={true} onClick={onInstall}>
           <div>
             <div>Install to applications</div>
             <small style={{ fontWeight: 500 }}>(optional, but encouraged)</small>

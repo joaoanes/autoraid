@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react"
 import { map, reverse, merge } from "lodash"
 import IconButton from "./IconButton"
@@ -46,6 +47,14 @@ export const PokemonList = (props) => {
       </div>
     </>
   )
+}
+
+PokemonList.propTypes = {
+  pokemonList: PropTypes.any.isRequired,
+  selected: PropTypes.shape({
+    boss_name: PropTypes.any
+  }).isRequired,
+  setSelected: PropTypes.func.isRequired
 }
 
 const styles = {

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React, { useState, useEffect } from "react"
 
 import { getUser, setUser } from "../lib/setUser"
@@ -10,11 +11,13 @@ import Header from "../components/Header"
 import Room from "../components/Room"
 import Faq from "../components/Faqs"
 import { socketForQueues, addUserToQueue, addRaidToQueue } from "../lib/ws"
-import { setNotification, hasPermission } from "../lib/notifications"
+import { setNotification as setNotificationAPI, hasPermission, setupPWAInstall, confirmPWAInstall } from "../lib/notifications"
 import RaidCreator from "../components/RaidCreator"
 import { getRaidList } from "../lib/pokemonList"
 
-const stateMapping = {
+const { REACT_APP_CYNDAQUIL_VERSION = "uhh", REACT_APP_WOOLOO_VERSION = "UHHH" } = process.env 
+
+export const stateMapping = {
   init: Home,
   login: Login,
   home: Home,
@@ -95,12 +98,19 @@ const Background = ({ matchmaking }) => (
   </div>
 )
 
-// Shit, I accidentally built a stateful router.
-export const Autoraid = (props) => {
-  const { state } = props
+Background.propTypes = {
+  matchmaking: PropTypes.any.isRequired
+}
+
+const installPWA = (prompt, setAccepted) => {
+  confirmPWAInstall(prompt, setAccepted)
+}
+
+export const WoolooWithState = () => {
+
   const [user, setInnerUser] = useState(getUser())
   const [socketOrError, setSocketOrError] = useState({})
-  const [appState, setInnerAppState] = useState(state || "init")
+  const [appState, setInnerAppState] = useState("init")
   const [activeSearch, setActiveSearch] = useState(null)
   const [ownedRaid, setOwnedRaid] = useState(null)
 
@@ -109,6 +119,69 @@ export const Autoraid = (props) => {
 
   const [activeRaids, setActiveRaids] = useState(null)
 
+  const [prompt, setPrompt] = useState(false)
+  const [acceptedInstall, setAccepted] = useState(false)
+
+  useEffect(() => {
+    getRaidList().then(setActiveRaids)
+  }, [])
+
+  useEffect(() => setupPWAInstall(setPrompt), [])
+
+  return (
+    <Autoraid 
+      {...{
+        user,
+        socketOrError,
+        appState,
+        activeSearch,
+        ownedRaid,
+        currentStats,
+        activeRoom,
+        activeRaids,
+        prompt,
+        acceptedInstall,
+        setPrompt,
+        setAccepted,
+        setActiveSearch,
+        setOwnedRaid,
+        setCurrentStats,
+        setRoom,
+        setInnerAppState,
+        setInnerUser,
+        setSocketOrError,
+        setNotification: setNotificationAPI
+      }} 
+    />
+  )
+}
+
+// Shit, I accidentally built a stateful router.
+export const Autoraid = (props) => {
+  const {
+    user,
+    socketOrError = {},
+    appState,
+    activeSearch,
+    ownedRaid,
+    currentStats,
+    activeRoom,
+    activeRaids,
+    setActiveSearch,
+    setOwnedRaid,
+    setCurrentStats,
+    setRoom,
+    prompt,
+    acceptedInstall,
+    setPrompt,
+    setAccepted,
+    setNotification,
+    setInnerAppState,
+    setInnerUser,
+    setSocketOrError,
+  } = props
+
+  
   const { socket, error: socketError, ready } = socketOrError
 
   console.log("Update", appState, user, socketOrError)
@@ -120,7 +193,8 @@ export const Autoraid = (props) => {
   const localSetAppState = setAppState(setInnerAppState, requireSocket(localSetSocketOrError, setCurrentStats, setActiveRoom(setInnerAppState, setRoom)))
   const localAddToQueue = addToQueue(socket, setActiveSearch, localSetAppState, user)
   const localRaidToQueue = raidToQueue(socket, setOwnedRaid, localSetAppState, user)
-
+  const localOnInstall = () => installPWA(prompt, setAccepted)
+  
   useEffect(() => {
     if (activeRoom) {
       setNotification("Raid ready!", `Add FC ${activeRoom.raid.leader.fc}`, "wooloo-raidready")
@@ -134,10 +208,6 @@ export const Autoraid = (props) => {
     }
   }, [activeSearch, currentStats])
 
-  useEffect(() => {
-    getRaidList().then(setActiveRaids)
-  }, [])
-
   return (
     <div style={styles.app}>
       <div style={styles.appContainer}>
@@ -145,11 +215,11 @@ export const Autoraid = (props) => {
           <Header user={user} setAppState={setAppState} />
         </div>
         <div style={styles.contentContainer}>
-          <StateComponent activeRaids={activeRaids} stop={stop} ownedRaid={ownedRaid} currentStats={currentStats} socketReady={ready} user={user} addRaidToQueue={localRaidToQueue} addToQueue={localAddToQueue} activeSearch={activeSearch} setUser={setUserPermanent(setInnerUser)} setAppState={localSetAppState} />
+          <StateComponent onInstall={localOnInstall} prompt={prompt} acceptedInstall={acceptedInstall} setPrompt={setPrompt} setAccepted={setAccepted} activeRaids={activeRaids} stop={stop} ownedRaid={ownedRaid} currentStats={currentStats} socketReady={ready} user={user} addRaidToQueue={localRaidToQueue} addToQueue={localAddToQueue} activeSearch={activeSearch} setUser={setUserPermanent(setInnerUser)} setAppState={localSetAppState} />
         </div>
         <div style={styles.footerContainer}>
           <footer style={styles.footer}>
-            <small>{"Autoraid 2020 (wooloo v.1.0.0 cyndaquil v.1.0.4)"}</small>
+            <small>{`Autoraid 2020 (wooloo v.${REACT_APP_WOOLOO_VERSION} cyndaquil v.${REACT_APP_CYNDAQUIL_VERSION})`}</small>
             <small>built with &lt;3 by <a style={styles.link} href="https://www.github.com/joaoanes">@joaoanes</a></small>
             {socket && <div style={{ ...styles.socket, ...(ready ? { opacity: 1 } : { animation: "fade infinite 0.5s alternate backwards" }), ...(socketError ? styles.error : {}) }}><img src="/connected.svg" /></div>}
           </footer>
@@ -158,6 +228,34 @@ export const Autoraid = (props) => {
       </div>
     </div>
   )
+}
+
+// npx react-proptypes-generate src/containers/Autoraid.js Autoraid
+Autoraid.propTypes = {
+  activeRaids: PropTypes.any.isRequired,
+  activeRoom: PropTypes.shape({
+    raid: PropTypes.shape({
+      leader: PropTypes.shape({
+        fc: PropTypes.any
+      })
+    })
+  }).isRequired,
+  activeSearch: PropTypes.shape({
+    boss_name: PropTypes.any
+  }).isRequired,
+  appState: PropTypes.any.isRequired,
+  currentStats: PropTypes.any.isRequired,
+  ownedRaid: PropTypes.any.isRequired,
+  setActiveRaids: PropTypes.func.isRequired,
+  setActiveSearch: PropTypes.func.isRequired,
+  setCurrentStats: PropTypes.func.isRequired,
+  setInnerAppState: PropTypes.func.isRequired,
+  setInnerUser: PropTypes.func.isRequired,
+  setOwnedRaid: PropTypes.func.isRequired,
+  setRoom: PropTypes.func.isRequired,
+  setSocketOrError: PropTypes.func.isRequired,
+  socketOrError: PropTypes.object.isRequired,
+  user: PropTypes.any.isRequired
 }
 
 const styles = {

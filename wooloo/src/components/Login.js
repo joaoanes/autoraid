@@ -32,11 +32,31 @@ const setFCIfValid = (setFC, oldFC) => (value) => {
   if (isNaN(Number.parseInt(value.charAt(value.length - 1), 0))) { return }
   setFC(value)
 }
-const Login = ({ setUser, setAppState }) => {
+
+const LoginWithState = ({setUser, setAppState}) => {
   setUser(null)
   const [name, setName] = useState("")
   const [fc, setFC] = useState("")
   const [level, setLevel] = useState("")
+
+  return (
+    <Login 
+      {...{
+        name,
+        setName,
+        fc,
+        setFC,
+        level,
+        setLevel,
+        setAppState,
+        setUser
+      }}
+    />
+  )
+}
+
+export const Login = ({ setUser, setAppState, name, setName, fc, setFC, level, setLevel }) => {
+  setUser(null)
 
   const localIsReady = isReady(name, fc, level)
   const localSetFCisValid = setFCIfValid(setFC, fc)
@@ -96,4 +116,4 @@ const styles = {
   },
 }
 
-export default Login
+export default LoginWithState

@@ -1,10 +1,10 @@
 import React from "react"
 
 import "./App.css"
-import { Autoraid } from "./containers/Autoraid"
+import { WoolooWithState } from "./containers/Autoraid"
 
 const App = () => (
-  <Autoraid />
+  <WoolooWithState />
 )
 
 export default App

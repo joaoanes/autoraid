@@ -5,10 +5,10 @@ import "rc-slider/assets/index.css"
 import { styles } from "./RaidPicker"
 import PokemonPicker from "./ui/PokemonPicker"
 
-const RaidCreator = ({ user, addRaidToQueue, activeRaids }) => {
+const RaidCreator = ({ user, addRaidToQueue, activeRaids, initialSelection, initialHasSelected }) => {
 
-  const [selected, setSelected] = useState(null)
-  const [hasSelected, setHasSelected] = useState(false)
+  const [selected, setSelected] = useState(initialSelection)
+  const [hasSelected, setHasSelected] = useState(initialHasSelected)
   const [maxInvites, setMaxInvites] = useState(5)
 
   return (
