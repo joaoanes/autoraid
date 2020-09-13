@@ -99,7 +99,7 @@ const Background = ({ matchmaking }) => (
 )
 
 Background.propTypes = {
-  matchmaking: PropTypes.any.isRequired
+  matchmaking: PropTypes.any
 }
 
 const installPWA = (prompt, setAccepted) => {
@@ -239,23 +239,23 @@ Autoraid.propTypes = {
         fc: PropTypes.any
       })
     })
-  }).isRequired,
+  }),
   activeSearch: PropTypes.shape({
     boss_name: PropTypes.any
-  }).isRequired,
+  }),
   appState: PropTypes.any.isRequired,
-  currentStats: PropTypes.any.isRequired,
-  ownedRaid: PropTypes.any.isRequired,
-  setActiveRaids: PropTypes.func.isRequired,
-  setActiveSearch: PropTypes.func.isRequired,
-  setCurrentStats: PropTypes.func.isRequired,
-  setInnerAppState: PropTypes.func.isRequired,
-  setInnerUser: PropTypes.func.isRequired,
-  setOwnedRaid: PropTypes.func.isRequired,
-  setRoom: PropTypes.func.isRequired,
-  setSocketOrError: PropTypes.func.isRequired,
-  socketOrError: PropTypes.object.isRequired,
-  user: PropTypes.any.isRequired
+  currentStats: PropTypes.any,
+  ownedRaid: PropTypes.any,
+  setActiveRaids: PropTypes.func,
+  setActiveSearch: PropTypes.func,
+  setCurrentStats: PropTypes.func,
+  setInnerAppState: PropTypes.func,
+  setInnerUser: PropTypes.func,
+  setOwnedRaid: PropTypes.func,
+  setRoom: PropTypes.func,
+  setSocketOrError: PropTypes.func,
+  socketOrError: PropTypes.object,
+  user: PropTypes.any
 }
 
 const styles = {

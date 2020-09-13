@@ -17,6 +17,7 @@ export default {
 const Template = (args) => <div style={{backgroundColor: 'red'}}><Login {...args} /></div>
 
 const dummyValues = {
+  setUser: () => null,
   activeRaids: {
     "1": [
       {

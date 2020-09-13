@@ -53,8 +53,8 @@ PokemonList.propTypes = {
   pokemonList: PropTypes.any.isRequired,
   selected: PropTypes.shape({
     boss_name: PropTypes.any
-  }).isRequired,
-  setSelected: PropTypes.func.isRequired
+  }),
+  setSelected: PropTypes.func
 }
 
 const styles = {
